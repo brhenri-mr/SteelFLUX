@@ -2,14 +2,15 @@ import numpy as np
 from gerdau.unit import unit
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
+from gerdau.plot import breakline
 
 class EndPLate:
     
     def __init__(self,
                  Conector, 
                  Plate, 
-                 Viga, 
+                 Viga,
+                 Coluna, 
                  n_ps:int,
                  s:float,
                  g_ch:float,
@@ -29,6 +30,8 @@ class EndPLate:
                 Classe de Plate
         * Viga: 
                 Classe de Viga
+        * Coluna:
+                Classe de Coluna
         * n_ps: int
                 Quantidade de parafusos na conexão
         * s: float
@@ -44,6 +47,7 @@ class EndPLate:
         self.Chapa = Plate
         self.Viga = Viga
         self.Parafuso = Conector
+        self.Coluna = Coluna
         
         self.d_h = Conector.d_b + 1.5*unit[Dimension_unit]
         self.s = s*unit[Dimension_unit]
@@ -57,6 +61,7 @@ class EndPLate:
         self.coef = coef
         self.coef1 = 1.1
 
+        self.TAMANHO = 300
 
     def platePlot(self):
         # Criar uma figura e eixos
@@ -156,8 +161,6 @@ class EndPLate:
         ax.text(width*0.55, self.Viga.h.magnitude*1.15, f'{self.Viga.name}', ha='left', va='center',)
         
         
-
-        
         for i in range(int(self.n_ps*0.5)):
                 # Definindo as coordenadas do centro de cada furo
                 x_d = width/2 + self.g_ch.magnitude/2
@@ -192,6 +195,77 @@ class EndPLate:
         plt.axis('off')
         plt.show()
 
+    def plotConnection(self):
+        unit.setup_matplotlib()
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        
+        parafuso_interno = min(0,(self.n_ps/2 - 1) - 1)
+        
+        # -------------------------------Coluna Definição das Breakline-------------------------------
+        for altura in [1, self.TAMANHO]:
+                coord = list(zip(*breakline(-1, altura, 
+                                            length=self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude)))
+                plt.plot(coord[0],coord[1], color='black', linewidth=0.8)
+        
+        # -------------------------------Coluna Definição das mesas-------------------------------
+        for offset in [0, self.Coluna.h.magnitude + self.Coluna.tf.magnitude]:
+                
+                mesa2 = patches.Rectangle((1 + offset,1), 
+                                 self.Coluna.tf.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
+                ax.add_patch(mesa2)
+
+        coluna = patches.Rectangle((1 + self.Coluna.tf.magnitude,1), 
+                                 self.Coluna.h.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
+        ax.add_patch(coluna)
+        
+        # ---------------------------------Chapa-----------------------------------------------------
+        rect = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1, self.TAMANHO/2 - self.Viga.h.magnitude/2 ), 
+                                 self.Chapa.t_ch.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='#D3D3D3')
+        ax.add_patch(rect)
+        # ---------------------------------Mesas-----------------------------------------------------
+        mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
+                                  self.TAMANHO/2 + self.Viga.h.magnitude/2  ), 
+                                 100, self.Viga.tf.magnitude, edgecolor='black', facecolor='gray')
+        ax.add_patch(mesa1)
+        
+        mesa2 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
+                                  self.TAMANHO/2 - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude ), 
+                                 100, self.Viga.tf.magnitude, edgecolor='black', facecolor='gray')
+        ax.add_patch(mesa2)
+        
+        alma = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
+                                  self.TAMANHO/2 - self.Viga.h.magnitude/2), 
+                                 100, self.Viga.h.magnitude, edgecolor='black', facecolor='gray')
+        ax.add_patch(alma)
+        
+        # ----------------------------------------Furos-----------------------------------------------------
+        
+        furo = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 , 
+                                  self.TAMANHO/2 - self.Viga.h.magnitude/2 + self.e.magnitude - self.d_h.magnitude/2), 
+                                 self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, self.d_h.magnitude, edgecolor='black', facecolor='black')
+        ax.add_patch(furo)
+        
+        furo = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 , 
+                                  self.TAMANHO/2 + self.Viga.h.magnitude/2 - self.e.magnitude - self.d_h.magnitude/2), 
+                                 self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, self.d_h.magnitude, edgecolor='black', facecolor='black')
+        ax.add_patch(furo)
+        
+        for i in range(parafuso_interno):
+                
+                furo_interno = patches.Rectangle((
+                                self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 , 
+                                self.TAMANHO/2 + self.Viga.h.magnitude/2 - self.e.magnitude - self.d_h.magnitude/2 +self.s*(i+1)), 
+                                self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, 
+                                self.d_h.magnitude, 
+                                edgecolor='black', facecolor='black')
+                ax.add_patch(furo_interno)
+        
+        
+        
+        
+        
+        plt.show() # if you need...
 
 
     def boltShear(self, Corte='Rosca') -> float:
@@ -330,13 +404,13 @@ class EndPLate:
         # Área bruta da seção 
         ag = ((0.5*self.n_ps - 1)*self.s + 2*self.e)*self.Chapa.t_ch
         
-        v_bruta = 0.6*self.Chapa.f_yc*ag/self.coef1
+        v_bruta = 2*0.6*self.Chapa.f_yc*ag/self.coef1
         
         # Resistência da seção liquída
         # Ver NBR 8800:2008 - Item 5.2.4.1
         anv = (self.n_ps*0.5*(self.d_h + 2*unit['millimeter'])*self.Chapa.t_ch)
          
-        v_liquida = 0.6*self.Chapa.f_uc*(ag - anv)/self.coef
+        v_liquida = 2*0.6*self.Chapa.f_uc*(ag - anv)/self.coef
         
         
         return min(v_bruta, v_liquida).to(self.Result_unit)

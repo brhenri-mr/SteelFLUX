@@ -1,4 +1,4 @@
-from gerdau.elements import Plate, Conector, Beam
+from gerdau.elements import Plate, Conector, Beam, Column
 from gerdau.connection import EndPLate
 
 chapa = Plate(t_ch=6.3,
@@ -16,9 +16,18 @@ viga = Beam(name='W150x13',
             fy=345,
             fu=400)
 
+coluna = Column(
+      name='w',
+      h=80,
+      tf=4.3
+)
+
+
+
 conexao = EndPLate(Conector=parafuso,
                    Plate=chapa,
                    Viga=viga,
+                   Coluna=coluna,
                    n_ps=4,
                    s=60,
                    g_ch=120)
@@ -47,3 +56,4 @@ print(f'''
       ''')
 
 conexao.platePlot()
+conexao.plotConnection()

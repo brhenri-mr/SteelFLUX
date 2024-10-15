@@ -19,6 +19,8 @@ class Beam:
                 Espessura da chapa
         * tf: float
                 Espessura do flange
+        * h: float
+                Altura da alma do perfil
         * fy: float
                 Resistência a escoamento da chapa
         * fu: float
@@ -78,6 +80,25 @@ class Conector:
         self.d_b = d_b*unit[Dimension_unit]
         self.f_ub = f_ub*unit[Resistence_unit]
 
+class Column:
+    def __init__(self, 
+                 name:str,
+                 tf:float,
+                 h:float,
+                 Dimension_unit='millimeter'):
+        '''
+        Parameters
+        ----------
+        
+        * tf: float
+                Espessura do flange
+        * h: float
+                Altura da alma do perfil
+
+        '''
+        self.name = name   
+        self.h = h*unit[Dimension_unit]
+        self.tf = tf*unit[Dimension_unit]
 
 if __name__ == '__main__':
     test = Conector(1,2)
