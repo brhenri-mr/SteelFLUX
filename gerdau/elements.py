@@ -33,6 +33,7 @@ class Beam:
         self.fy = fy*unit[Resistence_unit]
         self.fu = fu*unit[Resistence_unit]
 
+
 class Plate:
     
     def __init__(self, 
@@ -60,6 +61,7 @@ class Plate:
         self.f_uc = f_uc*unit[Resistence_unit]
         self.f_yc = f_yc*unit[Resistence_unit]
 
+
 class Conector:
     
     def __init__(self, 
@@ -80,6 +82,7 @@ class Conector:
         self.d_b = d_b*unit[Dimension_unit]
         self.f_ub = f_ub*unit[Resistence_unit]
 
+
 class Column:
     def __init__(self, 
                  name:str,
@@ -99,6 +102,7 @@ class Column:
         self.name = name   
         self.h = h*unit[Dimension_unit]
         self.tf = tf*unit[Dimension_unit]
+
 
 if __name__ == '__main__':
     test = Conector(1,2)

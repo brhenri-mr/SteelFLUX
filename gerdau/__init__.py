@@ -1,3 +1,3 @@
-from gerdau.connection import *
-from gerdau.elements import *
-from gerdau.plot import *
+from .connection import *
+from .elements import *
+from .plot import *

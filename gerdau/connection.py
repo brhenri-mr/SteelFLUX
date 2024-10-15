@@ -43,21 +43,24 @@ class EndPLate:
                 gabarito de furação da chapa de extremidade
         
         '''
-   
+        # Classes
         self.Chapa = Plate
         self.Viga = Viga
         self.Parafuso = Conector
         self.Coluna = Coluna
         
-        self.d_h = Conector.d_b + 1.5*unit[Dimension_unit]
-        self.s = s*unit[Dimension_unit]
-        self.e = (Viga.h - s*unit[Dimension_unit])/2
-        self.g_ch = g_ch*unit[Dimension_unit]
+        # Dados
+        self.d_h = Conector.d_b + 1.5*unit['millimeter'] # Diametro de furo
+        self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
+        self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
+        self.g_ch = g_ch*unit[Dimension_unit] # Distancia entre linhas de parafusos
+        
+        # Dimensoes
         self.Dimension_unit = Dimension_unit
         self.Result_unit = Result_unit
 
         # Admensional
-        self.n_ps = n_ps
+        self.n_ps = n_ps # Quantidade de parafusos
         self.coef = coef
         self.coef1 = 1.1
 
@@ -146,7 +149,7 @@ class EndPLate:
                     arrowprops={'arrowstyle': '<->'})
         
                 ax.text(self.Chapa.c.magnitude*1.16, 
-                        (self.Viga.h.magnitude*0.1 + self.e.magnitude + 0.5*self.s.magnitude*(i+1)), 
+                        (self.Viga.h.magnitude*0.1 + self.e.magnitude + (((i)*2 + 1)*self.s.magnitude)/2), 
                                                 f'{self.s.magnitude}', ha='left', va='center',rotation=90)
                 
         
@@ -192,15 +195,17 @@ class EndPLate:
                 
 
         # Deligando a moldura
+
         plt.axis('off')
         plt.show()
+
 
     def plotConnection(self):
         unit.setup_matplotlib()
         fig, ax = plt.subplots(figsize=(8, 6))
         
         
-        parafuso_interno = min(0,(self.n_ps/2 - 1) - 1)
+        parafuso_interno = int((self.n_ps/2 - 1))
         
         # -------------------------------Coluna Definição das Breakline-------------------------------
         for altura in [1, self.TAMANHO]:
@@ -223,15 +228,15 @@ class EndPLate:
         rect = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1, self.TAMANHO/2 - self.Viga.h.magnitude/2 ), 
                                  self.Chapa.t_ch.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='#D3D3D3')
         ax.add_patch(rect)
-        # ---------------------------------Mesas-----------------------------------------------------
+        # ---------------------------------VIGA-----------------------------------------------------
         mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
-                                  self.TAMANHO/2 + self.Viga.h.magnitude/2  ), 
-                                 100, self.Viga.tf.magnitude, edgecolor='black', facecolor='gray')
+                                  self.TAMANHO/2 + self.Viga.h.magnitude/2), 
+                                 100, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
         ax.add_patch(mesa1)
         
         mesa2 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
-                                  self.TAMANHO/2 - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude ), 
-                                 100, self.Viga.tf.magnitude, edgecolor='black', facecolor='gray')
+                                  self.TAMANHO/2 - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude*1.6 ), 
+                                 100, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
         ax.add_patch(mesa2)
         
         alma = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
@@ -251,20 +256,28 @@ class EndPLate:
                                  self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, self.d_h.magnitude, edgecolor='black', facecolor='black')
         ax.add_patch(furo)
         
-        for i in range(parafuso_interno):
+        for i in range(parafuso_interno-1):
                 
                 furo_interno = patches.Rectangle((
                                 self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 , 
-                                self.TAMANHO/2 + self.Viga.h.magnitude/2 - self.e.magnitude - self.d_h.magnitude/2 +self.s*(i+1)), 
+                                self.TAMANHO/2 - self.Viga.h.magnitude/2 + self.e.magnitude - self.d_h.magnitude/2 + self.s.magnitude*(i+1)), 
                                 self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, 
                                 self.d_h.magnitude, 
                                 edgecolor='black', facecolor='black')
                 ax.add_patch(furo_interno)
         
         
+        ax.annotate('', 
+                    xy=(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*0.5, 
+                        self.TAMANHO/2 + self.Viga.h.magnitude/2 ), 
+                    xytext=(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude,
+                            self.TAMANHO/2 + self.Viga.h.magnitude*0.65), 
+                    arrowprops={'arrowstyle': '->'})
+        ax.text(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude,
+                self.TAMANHO/2 + self.Viga.h.magnitude*0.65, f'CH {self.Chapa.t_ch.magnitude}', ha='left', va='center',)
         
         
-        
+        plt.axis('off')
         plt.show() # if you need...
 
 
@@ -342,12 +355,16 @@ class EndPLate:
         
         Return
         ------
-        Resistência mínima da chapa a pressão de contato incluindo rasgamento e esmagamento
+        * saida: float
+                Resistência mínima da chapa a pressão de contato incluindo rasgamento e esmagamento
+        
+        * individual: lista
+                Lista com as resistência indiviuais de cada região conectada
         '''
         # Quantidade de regiões q eu tenho
         times = int(2+self.n_ps/2-1)
-        
-        saida = 0
+        saida = [] # Lista com os valores individuais
+
         # O calculo é feito para cada parafuso
         for i in range(times):
 
@@ -358,10 +375,11 @@ class EndPLate:
                 else:
                         # Furo interna
                         crush_hole = 1.2*(self.e - 0.5*self.d_h)*self.Chapa.t_ch*self.Chapa.f_uc/self.coef
-                saida += min(crush,crush_hole)    
+                
+                saida.append(min(crush,crush_hole).to(self.Result_unit))   
                 
         
-        return saida.to(self.Result_unit)
+        return sum(saida).to(self.Result_unit), saida
 
 
     def plateShear(self):

@@ -28,7 +28,7 @@ conexao = EndPLate(Conector=parafuso,
                    Plate=chapa,
                    Viga=viga,
                    Coluna=coluna,
-                   n_ps=4,
+                   n_ps=6,
                    s=60,
                    g_ch=120)
 
@@ -39,7 +39,7 @@ Vrd = conexao.plateShear()
 
 Mpl = conexao.plateBearing()
 
-F = conexao.plateCrush()
+F, indv = conexao.plateCrush()
 
 F_vRd = conexao.boltShear()
 
@@ -51,6 +51,7 @@ print(f'''
       Cisalhamento na alma: {web}
       Cisalhamento no conjunto de parafusos: {F_vRd}
       Pressão de contato: {F}
+      Pressão de contato: {indv}
       Normal na placa: {Mpl}
       Block Shear: {block}
       ''')
