@@ -364,7 +364,7 @@ class EndPLate:
         # Quantidade de regiões q eu tenho
         times = int(2+self.n_ps/2-1)
         saida = [] # Lista com os valores individuais
-
+        
         # O calculo é feito para cada parafuso
         for i in range(times):
 
