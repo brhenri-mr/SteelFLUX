@@ -37,7 +37,7 @@ class Beam:
 class Plate:
     
     def __init__(self, 
-                 t_ch:float, 
+                 name:str, 
                  f_uc:float,
                  f_yc:float,
                  c:float,
@@ -47,7 +47,7 @@ class Plate:
         Parameters
         ----------
         
-        * t_ch: float
+        * name: str
                 Espessura da chapa
         * f_uc: float
                 Resistência a ruptura da chapa
@@ -56,7 +56,19 @@ class Plate:
         * c: float
                 Comprimento
         '''
-        self.t_ch = t_ch*unit[Dimension_unit]
+        
+        chapas = {'CH 3/16"':4.75*unit['millimeter'],
+                  'CH 1/4"':6.35*unit['millimeter'],
+                  'CH 5/16"':7.94*unit['millimeter'],
+                  'CH 3/8"':9.53*unit['millimeter'],
+                  'CH 1/2"':12.7*unit['millimeter'],
+                  'CH 5/8"':15.88*unit['millimeter'],
+                  'CH 3/4"':19.05*unit['millimeter'],
+                  'CH 7/8"':22.23*unit['millimeter'],
+                  }
+        
+        
+        self.t_ch = chapas[name].to(Dimension_unit)
         self.c = c*unit[Dimension_unit]
         self.f_uc = f_uc*unit[Resistence_unit]
         self.f_yc = f_yc*unit[Resistence_unit]

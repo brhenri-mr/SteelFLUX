@@ -3,6 +3,7 @@ from gerdau.unit import unit
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from gerdau.plot import breakline
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 class EndPLate:
     
@@ -54,7 +55,9 @@ class EndPLate:
         self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
         self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
         
-        assert s>= 3*Conector.d_b, 'Distância entre furos insuficiente' # Distância mínima entre furos Iterm 6.3.9
+        assert self.e.magnitude>0, 'Distância entre furos (s) está superando o comprimento da chapa'
+        
+        assert s>= 3*Conector.d_b.magnitude, 'Distância entre furos insuficiente' # Distância mínima entre furos Iterm 6.3.9
         
         self.g_ch = g_ch*unit[Dimension_unit] # Distancia entre linhas de parafusos
         
@@ -69,7 +72,7 @@ class EndPLate:
 
         self.TAMANHO = 300
 
-    def platePlot(self): 
+    def platePlot(self, ax=0, show=True): 
         # Criar uma figura e eixos
         unit.setup_matplotlib()
         
@@ -81,7 +84,8 @@ class EndPLate:
         local_plate = (self.Chapa.c.magnitude*0.1, self.Viga.h.magnitude*0.1) # Chapa
         local_web = ((width - self.Viga.tw.magnitude)*0.5, self.Viga.h.magnitude*0.1) # Alma da viga
         
-        fig, ax = plt.subplots(figsize=(8, 6))
+        if ax == 0:
+                fig, ax = plt.subplots(figsize=(8, 6))
         
         # Defindo os limites dos eixos
         ax.set_xlim(0, width)  
@@ -97,30 +101,43 @@ class EndPLate:
         ax.add_patch(hatch_rect)
 
         #--------------- Adicionar cota horizontal-----------------------------
-        ax.annotate('', 
-                    xy=(self.Chapa.c.magnitude*0.1, self.Viga.h.magnitude*0.03), 
-                    xytext=(self.Chapa.c.magnitude*1.1, self.Viga.h.magnitude*0.03), 
-                    arrowprops={'arrowstyle': '<->'})
-        
-        ax.text(width*0.5, self.Viga.h.magnitude*0.01, f'L = {self.Chapa.c.magnitude}', ha='center', va='center') 
-        
-        ax.annotate('', 
-                    xy=(width/2 - self.g_ch.magnitude/2, self.Viga.h.magnitude*0.08), 
-                    xytext=(width/2 + self.g_ch.magnitude/2, self.Viga.h.magnitude*0.08), 
-                    arrowprops={'arrowstyle': '<->'})
-        
-        ax.text(width*0.5, self.Viga.h.magnitude*0.06, f'g_ch = {self.g_ch.magnitude}', ha='center', va='center') 
-        
-
+        if show:
+                ax.annotate('', 
+                        xy=(self.Chapa.c.magnitude*0.1, self.Viga.h.magnitude*0.03), 
+                        xytext=(self.Chapa.c.magnitude*1.1, self.Viga.h.magnitude*0.03), 
+                        arrowprops={'arrowstyle': '<->'})
+                
+                ax.text(width*0.5, self.Viga.h.magnitude*0.01, f'L = {self.Chapa.c.magnitude}', ha='center', va='center') 
+                
+                ax.annotate('', 
+                        xy=(width/2 - self.g_ch.magnitude/2, self.Viga.h.magnitude*0.08), 
+                        xytext=(width/2 + self.g_ch.magnitude/2, self.Viga.h.magnitude*0.08), 
+                        arrowprops={'arrowstyle': '<->'})
+                
+                ax.text(width*0.5, self.Viga.h.magnitude*0.06, f'g_ch = {self.g_ch.magnitude}', ha='center', va='center') 
+        else:
+                ax.annotate('', 
+                        xy=(self.Chapa.c.magnitude*0.1, self.Viga.h.magnitude*1.20), 
+                        xytext=(self.Chapa.c.magnitude*1.1, self.Viga.h.magnitude*1.20), 
+                        arrowprops={'arrowstyle': '<->'})
+                
+                ax.text(width*0.5, self.Viga.h.magnitude*1.25, f'L = {self.Chapa.c.magnitude}', ha='center', va='center',fontsize=8) 
+                
+                ax.annotate('', 
+                        xy=(width/2 - self.g_ch.magnitude/2, self.Viga.h.magnitude*1.12), 
+                        xytext=(width/2 + self.g_ch.magnitude/2, self.Viga.h.magnitude*1.12), 
+                        arrowprops={'arrowstyle': '<->'})
+                
+                ax.text(width*0.5, self.Viga.h.magnitude*1.15, f'{self.g_ch.magnitude}', ha='center', va='center',fontsize=8) 
         
         
         #--------------------------------------- Adicionar cota Vertical-------------------------------------
         ax.annotate('', 
-                    xy=(self.Chapa.c.magnitude*1.20, self.Viga.h.magnitude*0.1), 
-                    xytext=(self.Chapa.c.magnitude*1.20, self.Viga.h.magnitude*1.1), 
+                    xy=(self.Chapa.c.magnitude*0.07, self.Viga.h.magnitude*0.1), 
+                    xytext=(self.Chapa.c.magnitude*0.07, self.Viga.h.magnitude*1.1), 
                     arrowprops={'arrowstyle': '<->'})
         
-        ax.text(self.Chapa.c.magnitude*1.21, height*0.5, f'{self.Viga.h.magnitude}', 
+        ax.text(self.Chapa.c.magnitude*0.00000001, height*0.5, f'{self.Viga.h.magnitude}', 
                                                                         ha='left', va='center', rotation=90)
         ## Definicao do e inferior
         ax.annotate('', 
@@ -157,14 +174,14 @@ class EndPLate:
                 
         
         #---------------------------------------------------------------------------------------------------
-        
+        if show:
         # Adicionando corta vertical
-        ax.annotate('', 
+                ax.annotate('', 
                     xy=(width*0.5, self.Viga.h.magnitude*1.1), 
                     xytext=(width*0.55,self.Viga.h.magnitude*1.15), 
                     arrowprops={'arrowstyle': '->'})
         
-        ax.text(width*0.55, self.Viga.h.magnitude*1.15, f'{self.Viga.name}', ha='left', va='center',)
+                ax.text(width*0.55, self.Viga.h.magnitude*1.15, f'{self.Viga.name}', ha='left', va='center',)
         
         
         for i in range(int(self.n_ps*0.5)):
@@ -200,13 +217,16 @@ class EndPLate:
         # Deligando a moldura
 
         plt.axis('off')
-        plt.show()
+        if show:
+                plt.show()
+        return ax
 
 
-    def plotConnection(self):
+    def plotView(self, show=True):
         unit.setup_matplotlib()
         fig, ax = plt.subplots(figsize=(8, 6))
         
+        ax.set_ylim(0, self.TAMANHO*1.17)  
         
         parafuso_interno = int((self.n_ps/2 - 1))
         
@@ -281,8 +301,55 @@ class EndPLate:
         
         
         plt.axis('off')
-        plt.show() # if you need...
+        if show:
+                plt.show() # if you need...
+        
+        return ax
 
+
+    def plotConnection(self):
+                desenho = self.plotView(show=False)
+                ax_inset = inset_axes(desenho, width="35%", height="35%", loc='upper right')
+                
+                self.platePlot(ax= ax_inset, show=False)
+                
+                
+                # Copiando retângulos do gráfico de detalhe para o gráfico inset
+                for artist in ax_inset.patches:
+                        if isinstance(artist, patches.Rectangle):
+                                # Se for um retângulo, copie suas propriedades
+                                inset_rect = patches.Rectangle(
+                                (artist.get_x(), artist.get_y()),
+                                artist.get_width(),
+                                artist.get_height(),
+                                linewidth=1,
+                                edgecolor=artist.get_edgecolor(),
+                                facecolor='none'
+                                )
+                                ax_inset.add_patch(inset_rect)
+                        elif isinstance(artist, patches.Circle):
+                                # Se for um círculo, copie suas propriedades
+                                inset_circle = patches.Circle(
+                                (artist.center[0], artist.center[1]),  # Usa center do círculo
+                                artist.radius,
+                                linewidth=1,
+                                edgecolor=artist.get_edgecolor(),
+                                facecolor='none'
+                                )
+                                ax_inset.add_patch(inset_circle)
+
+                # Configurações adicionais no inset (opcional)
+                
+                        # Tamanho da imagem - dos eixos 
+        
+                ax_inset.set_title('')
+                ax_inset.set_xlim(0, self.Chapa.c.magnitude*1.2)  # Zoom opcional
+                ax_inset.set_ylim(0, self.Viga.h.magnitude*1.2)
+                ax_inset.set_xticks([])
+                ax_inset.set_yticks([])
+
+                # Mostrando o gráfico combinado
+                plt.show()
 
     def boltShear(self, Corte='Rosca') -> float:
         '''
