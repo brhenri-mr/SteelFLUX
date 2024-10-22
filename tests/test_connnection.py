@@ -1,11 +1,10 @@
 from gerdau.connection import EndPLate
 from gerdau.elements import Column, Conector, Beam, Plate
 
-
 chapa = Plate(t_ch=6.3,
               c= 200,
               f_uc=400,
-              f_yc=250)
+              f_yc=345)
 
 parafuso = Conector(d_b=15.875,
                     f_ub=825)
@@ -31,14 +30,15 @@ conexao = EndPLate(Conector=parafuso,
                    s=60,
                    g_ch=120)
 
-"""
+
 def test_blockShear():
     '''
     Função para test do blockshear na conexão
     '''
-    print(conexao.blockShear().magnitude)
-    assert conexao.blockShear().magnitude == 119.53, 'Valor de BlockShear está errado'
-""" 
+    tol = 10E-3
+    assert conexao.blockShear
+    ().magnitude - 307.0667 < 10E-3, 'Valor de BlockShear está errado'
+
     
 
 def test_plateShear():

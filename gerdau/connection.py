@@ -53,6 +53,9 @@ class EndPLate:
         self.d_h = Conector.d_b + 1.5*unit['millimeter'] # Diametro de furo
         self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
         self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
+        
+        assert s>= 3*Conector.d_b, 'Distância entre furos insuficiente' # Distância mínima entre furos Iterm 6.3.9
+        
         self.g_ch = g_ch*unit[Dimension_unit] # Distancia entre linhas de parafusos
         
         # Dimensoes
@@ -66,7 +69,7 @@ class EndPLate:
 
         self.TAMANHO = 300
 
-    def platePlot(self):
+    def platePlot(self): 
         # Criar uma figura e eixos
         unit.setup_matplotlib()
         
@@ -552,60 +555,37 @@ class EndPLate:
         ------
         Resistência ao rasgamento da chapa
         '''
+        # Variaveis
+        qntd_s = ((self.n_ps/2) - 1) # quantidade de espaçamentos s
         
-        ## Caso 1
+        ## Caso 1 -- Caso com tração indo para borda externa
         # área de cisalhamento bruta
-        a_gv = 2*((((self.n_ps) - 1) - 1)*self.s + self.e)*self.Chapa.t_ch
+        a_gv = 2*(qntd_s*self.s + self.e)*self.Chapa.t_ch
         
         # Área líquida interna
-        a_nv_int = (self.n_ps/2 - 1)*((self.d_h +2*unit['millimeter'])*self.Chapa.t_ch)
+        a_nv_int = qntd_s*((self.d_h +2*unit['millimeter'])*self.Chapa.t_ch)
         
         # Área líquida externa
         a_nv_ext = (0.5*(self.d_h +2*unit['millimeter'])*self.Chapa.t_ch)
         
         # Área líquida
-        a_nv = a_gv - 2*(a_nv_ext - a_nv_int)
+        a_nv = a_gv - 2*(a_nv_ext + a_nv_int)
         
         # Área líquida de tração
-        a_nt = 2*((0.5*(self.d_h +2*unit['millimeter'])*self.Chapa.t_ch) + self.Chapa.t_ch*(self.Chapa.c - self.g_ch )*0.5)
+        a_nt = 2*(-(0.5*(self.d_h +2*unit['millimeter'])*self.Chapa.t_ch) + self.Chapa.t_ch*(self.Chapa.c - self.g_ch )*0.5)
         
         # Cálculo da resistência de rasgamento para o caso 1
         f_rRd = min(0.6*self.Chapa.f_uc*a_nv + cts*self.Chapa.f_uc*a_nt,
                 0.6*self.Chapa.f_yc*a_gv + cts*self.Chapa.f_uc*a_nt)
+
         
-        
-        ## Caso 2
+        ## Caso 2 -- Tração nos furos internos se conectam
         # Área líquida de tração
-        a_nt = ((self.d_h +2*unit['millimeter'])*self.Chapa.t_ch) + self.Chapa.t_ch*(self.g_ch)
+        a_nt = -((self.d_h +2*unit['millimeter'])*self.Chapa.t_ch) + self.Chapa.t_ch*(self.g_ch)
         
         # Cálculo da resistência de rasgamento para o caso 2
         f_rRd = min(0.6*self.Chapa.f_uc*a_nv + cts*self.Chapa.f_uc*a_nt,
                 0.6*self.Chapa.f_yc*a_gv + cts*self.Chapa.f_uc*a_nt,
-                f_rRd)
-        
-        # o CASO 3 ERA UM CASO A VER COM O RASGAMENTO ENTRE PARAFUSO NA ZONA EXTERNA, MAS NÃO
-        #FAZ SENTIDO
-        
-        ## Caso 4
-        
-        # área de cisalhamento bruta
-        a_gv = ((((self.n_ps) - 1) - 1)*self.s)*self.Chapa.t_ch
-        
-        # Área líquida interna
-        a_nv_int = (self.n_ps/2 - 1)*((self.d_h + 2*unit['millimeter'])*self.Chapa.t_ch)
-        
-        # Área líquida externa
-        a_nv_ext = (0.5*(self.d_h +2*unit['millimeter'])*self.Chapa.t_ch)
-        
-        # Área líquida
-        a_nv = a_gv - (a_nv_ext - a_nv_int)
-        
-        # Área líquida de tração
-        a_nt = ((0.5*(self.d_h +2*unit['millimeter'])*self.Chapa.t_ch) + self.Chapa.t_ch*((self.Chapa.c + self.g_ch)*0.5))
-        
-        # Cálculo da resistência de rasgamento para o caso 4
-        f_rRd = min(0.6*self.Chapa.f_uc*a_nv + cts*self.Chapa.f_uc*a_nt,
-                0.6*self.Chapa.f_yc*a_gv+ cts*self.Chapa.f_uc*a_nt,
                 f_rRd)
         
         
