@@ -1,6 +1,7 @@
 from sqlalchemy.orm import registry, Mapped, mapped_column, relationship
 from sqlalchemy import func, ForeignKey
 from datetime import datetime
+from uuid import UUID
 
 table_registry = registry()
 
@@ -12,6 +13,9 @@ class Dados():
     
     # id
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
+    
+    # Identificador unico
+    uuid: Mapped[UUID]
     
     # Nome do perfil
     nome_perfil: Mapped[str]
@@ -43,7 +47,9 @@ class Stress():
     __tablename__ = 'stress_table'
     __table_args__ = {'quote': True}  # Indica que o nome da tabela deve ser tratado com aspas duplas
     
-    id:Mapped[int] = mapped_column(ForeignKey('dados_table.id'), primary_key=True)
+    id:Mapped[int] = mapped_column(init=False, primary_key=True)
+    
+    uuid: Mapped[UUID] = mapped_column(ForeignKey('dados_table.uuid'))
     
     block:Mapped[float] = mapped_column(nullable=True)
     
@@ -54,6 +60,3 @@ class Stress():
     bolt_shear:Mapped[float] = mapped_column(nullable=True)
     
     web_shear:Mapped[float] = mapped_column(nullable=True)
-
-    
-    dados: Mapped['Dados'] = relationship() 

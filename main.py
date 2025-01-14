@@ -1,6 +1,7 @@
 from gerdau.elements import Plate, Conector, Beam, Column
 from gerdau.connection import EndPLate
 import pandas as pd
+from gerdau.db import load_data
 
 saida = pd.DataFrame(columns=['Perfil', 'Chapa', 'Bitola','Material', 's', 'Parafuso', 'Block', 
                               'ShearPlate', 'PlateCrush', 'boltShear', 'webShear', 'FS'])
@@ -29,10 +30,6 @@ chapa = Plate(name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
 
 conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=False)
 
-
-conexao.plotConnection(show=False, index=1)
-
-'''
 for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5/8"', 'CH 3/4"', 'CH 7/8"' ]:
       for nome, materia_chapa in material.items():
             for element in bitolas:
@@ -57,7 +54,8 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                                           Coluna=coluna,
                                           n_ps=2*i,
                                           s=element*3.2,
-                                          g_ch=120)
+                                          g_ch=120,
+                                          dev_mode=False)
                                     
                               block = conexao.blockShear()
                               
@@ -71,27 +69,22 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
 
                               FS = 80/min(block, Vrd, F_vRd, F).magnitude
                               
-                              temp = pd.DataFrame({'Perfil':'W150x13',
-                                            'Chapa':[chapa_tipo],
-                                            'Bitola': [element],
-                                            'Material':[nome],
-                                            's':[3.2*element],
-                                            'Parafuso':[i*2],
-                                            'Block':[block],
-                                            'ShearPlate':[Vrd],
-                                            'PlateCrush':[F],
-                                            'boltShear':[F_vRd],
-                                            'webShear':[0],
-                                            'FS':[FS]
-                                            })
-
-                              saida = pd.concat([saida, temp], ignore_index=True)
-                        
+                              ret, uuid = load_data(nome_perfil = 'W150x13',
+                                          nome_chapa = chapa_tipo,
+                                          bitola_parafuso = element,
+                                          material_chapa = nome,
+                                          distancia_s = 3.2*element,
+                                          qntd_parafusos = i*2,
+                                          fs = FS,
+                                          bolt_shear=F_vRd,
+                                          block = block,
+                                          shear_plate = Vrd,
+                                          plate_crush = F,
+                                          web_shear = 0)
+      
+                              conexao.plotConnection(show=False, index=uuid)
+                              
                         except AssertionError as e:
                               print(f'Falha em {element} para o conjunto com {i*2} parafusos')
                               print(f'{e}')
                               break
-
-
-saida.to_excel('Saida.xlsx')
-'''

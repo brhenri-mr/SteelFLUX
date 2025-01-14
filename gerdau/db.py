@@ -1,8 +1,8 @@
-from .models import Dados
+from .models import Dados, Stress
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from settings import Settings
-
+from uuid import uuid4
 
 def load_data(nome_perfil:str,
               nome_chapa:str,
@@ -10,7 +10,12 @@ def load_data(nome_perfil:str,
               material_chapa:str,
               distancia_s:float,
               qntd_parafusos:int,
-              fs:float):
+              fs:float,
+              block:float,
+              shear_plate:float,
+              plate_crush:float,
+              bolt_shear:float,
+              web_shear:float):
     '''
     Função que carrega os dados para o banco de dados SQL
     
@@ -19,7 +24,18 @@ def load_data(nome_perfil:str,
      - True - Tudo certo
      - False - Deu errado
     '''
+    uuid = uuid4()
+    
     try:
+        # Dados de tensão
+        new_stress = Stress(block=block.magnitude,
+                            shear_plate = shear_plate.magnitude,
+                            plate_crush = plate_crush.magnitude,
+                            bolt_shear=bolt_shear.magnitude,
+                            web_shear=web_shear,
+                            uuid=uuid
+                            )
+        
         # Novo banco de dados
         new_db = Dados(nome_perfil=nome_perfil,
                     nome_chapa=nome_chapa,
@@ -27,14 +43,17 @@ def load_data(nome_perfil:str,
                     material_chapa=material_chapa,
                     distancia_s=distancia_s,
                     qntd_parafusos=qntd_parafusos,
-                    fs=fs)
+                    fs=fs,
+                    uuid=uuid,
+                    stress=new_stress,
+                    )
         
         with Session(create_engine(Settings().DATABASE_URL)) as session:
             session.add(new_db)
             session.commit()
             session.refresh(new_db)
     
-        return True
+        return True, uuid
     
-    except: 
-        return False
+    except Exception as e: 
+        return e, uuid

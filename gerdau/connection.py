@@ -368,7 +368,7 @@ class EndPLate:
 
         # Salvando a imagem no local correto      
         if not self.dev_mode:
-                plt.savefig(os.path.join(self.settings.DATASET_URL,'img',f'img_{index}.png'))
+                plt.savefig(os.path.join(self.settings.DATASET_URL,'img',f'{index}.png'))
                 
         
         # Mostrando o gráfico combinado
