@@ -25,7 +25,7 @@ coluna = Column(
 
 parafuso = Conector(d_b=16,  f_ub=825)
 
-chapa = Plate(    name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
+chapa = Plate(name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
 
 conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120)
 

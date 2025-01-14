@@ -15,6 +15,12 @@ pandas = "^2.2.3"
 openpyxl = "^3.1.5"
 
 
+[tool.poetry.group.data.dependencies]
+sqlalchemy = "^2.0.37"
+pydantic = "^2.10.5"
+pydantic-settings = "^2.7.1"
+alembic = "^1.14.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
