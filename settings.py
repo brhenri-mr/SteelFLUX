@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+from typing import Tuple
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -9,3 +9,4 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     DATASET_URL: str
     TAMANHO_IMG: int
+    EXT:str

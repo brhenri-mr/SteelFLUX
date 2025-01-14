@@ -2,6 +2,7 @@ from gerdau.elements import Plate, Conector, Beam, Column
 from gerdau.connection import EndPLate
 import pandas as pd
 from gerdau.db import load_data
+from uuid import uuid4
 
 saida = pd.DataFrame(columns=['Perfil', 'Chapa', 'Bitola','Material', 's', 'Parafuso', 'Block', 
                               'ShearPlate', 'PlateCrush', 'boltShear', 'webShear', 'FS'])
@@ -28,15 +29,18 @@ parafuso = Conector(d_b=16,  f_ub=825)
 
 chapa = Plate(name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
 
-conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=False)
+conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=False, uuid=uuid4())
+conexao.plotConnection(show=False)
+conexao.mask()
 
-for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5/8"', 'CH 3/4"', 'CH 7/8"' ]:
+'''for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5/8"', 'CH 3/4"', 'CH 7/8"' ]:
       for nome, materia_chapa in material.items():
             for element in bitolas:
                   i = 0
                   while True:
                         i += 1
                         try:
+                              uuid = uuid4()
                               chapa = Plate(    name=chapa_tipo,
                                                 c= 200,
                                                 f_uc=materia_chapa['fu'],
@@ -55,7 +59,8 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                                           n_ps=2*i,
                                           s=element*3.2,
                                           g_ch=120,
-                                          dev_mode=False)
+                                          dev_mode=False,
+                                          uuid=uuid)
                                     
                               block = conexao.blockShear()
                               
@@ -69,7 +74,7 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
 
                               FS = 80/min(block, Vrd, F_vRd, F).magnitude
                               
-                              ret, uuid = load_data(nome_perfil = 'W150x13',
+                              ret = load_data(nome_perfil = 'W150x13',
                                           nome_chapa = chapa_tipo,
                                           bitola_parafuso = element,
                                           material_chapa = nome,
@@ -80,11 +85,14 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                                           block = block,
                                           shear_plate = Vrd,
                                           plate_crush = F,
-                                          web_shear = 0)
+                                          web_shear = 0,
+                                          uuid=uuid)
       
-                              conexao.plotConnection(show=False, index=uuid)
+                              conexao.plotConnection(show=False)
+                              conexao.mask()
                               
                         except AssertionError as e:
                               print(f'Falha em {element} para o conjunto com {i*2} parafusos')
                               print(f'{e}')
                               break
+'''

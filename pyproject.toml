@@ -22,6 +22,10 @@ pydantic = "^2.10.5"
 pydantic-settings = "^2.7.1"
 alembic = "^1.14.0"
 
+
+[tool.poetry.group.mask.dependencies]
+opencv-python = "^4.10.0.84"
+
 [tool.taskipy.tasks]
 run = "python main.py"
 

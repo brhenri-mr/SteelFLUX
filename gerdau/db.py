@@ -2,7 +2,7 @@ from .models import Dados, Stress
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from settings import Settings
-from uuid import uuid4
+from uuid import UUID
 
 def load_data(nome_perfil:str,
               nome_chapa:str,
@@ -15,7 +15,8 @@ def load_data(nome_perfil:str,
               shear_plate:float,
               plate_crush:float,
               bolt_shear:float,
-              web_shear:float):
+              web_shear:float,
+              uuid:UUID):
     '''
     Função que carrega os dados para o banco de dados SQL
     
@@ -24,7 +25,6 @@ def load_data(nome_perfil:str,
      - True - Tudo certo
      - False - Deu errado
     '''
-    uuid = uuid4()
     
     try:
         # Dados de tensão
@@ -53,7 +53,7 @@ def load_data(nome_perfil:str,
             session.commit()
             session.refresh(new_db)
     
-        return True, uuid
+        return True
     
     except Exception as e: 
-        return e, uuid
+        return e

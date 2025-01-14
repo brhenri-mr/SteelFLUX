@@ -6,6 +6,9 @@ from gerdau.plot import breakline
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from settings import Settings
 import os
+from uuid import UUID
+
+import cv2
 
 class EndPLate:
     
@@ -17,6 +20,7 @@ class EndPLate:
                  n_ps:int,
                  s:float,
                  g_ch:float,
+                 uuid:UUID,
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton',
                  coef=1.35,
@@ -45,6 +49,8 @@ class EndPLate:
                 
         * g_ch: float
                 gabarito de furação da chapa de extremidade
+        * uuid: UUID
+                Identificador unico da conexão
         
         '''
         # Classes
@@ -76,6 +82,9 @@ class EndPLate:
         self.TAMANHO = Settings().TAMANHO_IMG
         
         self.settings = Settings()
+        
+        self.uuid = uuid
+        self.pontos_ancoragem = {}
         
         #dev_mode controla se a classe irá ou não salvar as imagens
         # Caso seja True, as imagens não serão salvar
@@ -258,8 +267,14 @@ class EndPLate:
         ax.add_patch(coluna)
         
         # ---------------------------------Chapa-----------------------------------------------------
-        rect = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1, self.TAMANHO/2 - self.Viga.h.magnitude/2 ), 
+        chapa_ponto_init = (self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1, self.TAMANHO/2 - self.Viga.h.magnitude/2 )
+        chapa_ponto_final = (self.Chapa.t_ch.magnitude, self.Viga.h.magnitude,)
+        rect = patches.Rectangle(chapa_ponto_init, 
                                  self.Chapa.t_ch.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='#D3D3D3')
+        
+        # Salvando ponto de ancoragem do elemento
+        self.pontos_ancoragem['Chapa'] = {'Start':chapa_ponto_init,'Final':chapa_ponto_final}
+        print(self.pontos_ancoragem)
         ax.add_patch(rect)
         # ---------------------------------VIGA-----------------------------------------------------
         mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
@@ -316,15 +331,44 @@ class EndPLate:
         
         return ax
 
+    def mask(self):
+        '''
+        Método para geração da mascara da imagem da conexão
+        '''
+        # Definindo o caminho da imagem
+        arquivo = os.path.join('dataset/img',f'{self.uuid}.{self.settings.EXT}')
+        
+        # definndo pontos
+        pontos = []
+        
+        tamanho = int(self.TAMANHO*1.1)
+        
+        # Verificando se o arquivo existe
+        if os.path.isfile(arquivo):
+                # Carregando a imagem
+                img = cv2.imread(arquivo)
+                
+                # Iterando sobre os pontos
+                for chave,pontos in self.pontos_ancoragem.items():
+                        if chave == 'Chapa':
+                                start = (int(tamanho + pontos['Start'][0]), tamanho - int(pontos['Start'][1]*1.85))
+                                end = (int(tamanho) + int(pontos['Final'][0]), int(tamanho - 0.35*(pontos['Final'][1]) + start[1]))
+                                print(start, end)
+                        else:
+                                start = (tamanho - int(pontos['Start'][0]), tamanho - int(pontos['Start'][1]))
+                                end = (tamanho - int(pontos['Final'][0]), tamanho - int(pontos['Final'][1]))
+                                print(start, end)
+                        img = cv2.rectangle(img, start, end, color=(0, 0, 0), thickness=-1)
+                
+                # Salvando imagem
+                cv2.imwrite(os.path.join(r'dataset/img_mask', f'{self.uuid}.{self.settings.EXT}'), img)
+        else:
+                return False, 'Arquivo não existente'
+        
 
-    def plotConnection(self, index:int, show=True,):
+    def plotConnection(self, show=True,):
         '''
         Função para plotar a conexão feita
-        
-        Parameters:
-        ----------
-        - index: int.
-                identificador unico da conexão. Esse número será utilizado na hora de salvar a img
         '''
         desenho = self.plotView(show=False)
         ax_inset = inset_axes(desenho, width="35%", height="35%", loc='upper right')
@@ -336,6 +380,8 @@ class EndPLate:
         for artist in ax_inset.patches:
                 if isinstance(artist, patches.Rectangle):
                         # Se for um retângulo, copie suas propriedades
+                        self.pontos_ancoragem['Detalhe'] = {'Start':(artist.get_x(), artist.get_y()), 
+                                                            'Final':(artist.get_width(), artist.get_height())}
                         inset_rect = patches.Rectangle(
                         (artist.get_x(), artist.get_y()),
                         artist.get_width(),
@@ -368,7 +414,7 @@ class EndPLate:
 
         # Salvando a imagem no local correto      
         if not self.dev_mode:
-                plt.savefig(os.path.join(self.settings.DATASET_URL,'img',f'{index}.png'))
+                plt.savefig(os.path.join(self.settings.DATASET_URL,'img',f'{self.uuid}.png'))
                 
         
         # Mostrando o gráfico combinado
