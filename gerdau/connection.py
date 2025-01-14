@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from gerdau.plot import breakline
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from settings import Settings
+import os
 
 class EndPLate:
     
@@ -17,7 +19,8 @@ class EndPLate:
                  g_ch:float,
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton',
-                 coef=1.35) -> None:
+                 coef=1.35,
+                 dev_mode=True) -> None:
         '''
         Status Não Testado
         -----------------
@@ -70,7 +73,14 @@ class EndPLate:
         self.coef = coef
         self.coef1 = 1.1
 
-        self.TAMANHO = 300
+        self.TAMANHO = Settings().TAMANHO_IMG
+        
+        self.settings = Settings()
+        
+        #dev_mode controla se a classe irá ou não salvar as imagens
+        # Caso seja True, as imagens não serão salvar
+        # Caso contrario, serão
+        self.dev_mode = dev_mode
 
     def platePlot(self, ax=0, show=True): 
         # Criar uma figura e eixos
@@ -307,49 +317,64 @@ class EndPLate:
         return ax
 
 
-    def plotConnection(self):
-                desenho = self.plotView(show=False)
-                ax_inset = inset_axes(desenho, width="35%", height="35%", loc='upper right')
-                
-                self.platePlot(ax= ax_inset, show=False)
-                
-                
-                # Copiando retângulos do gráfico de detalhe para o gráfico inset
-                for artist in ax_inset.patches:
-                        if isinstance(artist, patches.Rectangle):
-                                # Se for um retângulo, copie suas propriedades
-                                inset_rect = patches.Rectangle(
-                                (artist.get_x(), artist.get_y()),
-                                artist.get_width(),
-                                artist.get_height(),
-                                linewidth=1,
-                                edgecolor=artist.get_edgecolor(),
-                                facecolor='none'
-                                )
-                                ax_inset.add_patch(inset_rect)
-                        elif isinstance(artist, patches.Circle):
-                                # Se for um círculo, copie suas propriedades
-                                inset_circle = patches.Circle(
-                                (artist.center[0], artist.center[1]),  # Usa center do círculo
-                                artist.radius,
-                                linewidth=1,
-                                edgecolor=artist.get_edgecolor(),
-                                facecolor='none'
-                                )
-                                ax_inset.add_patch(inset_circle)
-
-                # Configurações adicionais no inset (opcional)
-                
-                        # Tamanho da imagem - dos eixos 
+    def plotConnection(self, index:int, show=True,):
+        '''
+        Função para plotar a conexão feita
         
-                ax_inset.set_title('')
-                ax_inset.set_xlim(0, self.Chapa.c.magnitude*1.2)  # Zoom opcional
-                ax_inset.set_ylim(0, self.Viga.h.magnitude*1.2)
-                ax_inset.set_xticks([])
-                ax_inset.set_yticks([])
+        Parameters:
+        ----------
+        - index: int.
+                identificador unico da conexão. Esse número será utilizado na hora de salvar a img
+        '''
+        desenho = self.plotView(show=False)
+        ax_inset = inset_axes(desenho, width="35%", height="35%", loc='upper right')
+        
+        self.platePlot(ax= ax_inset, show=False)
+        
+        
+        # Copiando retângulos do gráfico de detalhe para o gráfico inset
+        for artist in ax_inset.patches:
+                if isinstance(artist, patches.Rectangle):
+                        # Se for um retângulo, copie suas propriedades
+                        inset_rect = patches.Rectangle(
+                        (artist.get_x(), artist.get_y()),
+                        artist.get_width(),
+                        artist.get_height(),
+                        linewidth=1,
+                        edgecolor=artist.get_edgecolor(),
+                        facecolor='none'
+                        )
+                        ax_inset.add_patch(inset_rect)
+                elif isinstance(artist, patches.Circle):
+                        # Se for um círculo, copie suas propriedades
+                        inset_circle = patches.Circle(
+                        (artist.center[0], artist.center[1]),  # Usa center do círculo
+                        artist.radius,
+                        linewidth=1,
+                        edgecolor=artist.get_edgecolor(),
+                        facecolor='none'
+                        )
+                        ax_inset.add_patch(inset_circle)
 
-                # Mostrando o gráfico combinado
+        # Configurações adicionais no inset (opcional)
+        
+                # Tamanho da imagem - dos eixos 
+
+        ax_inset.set_title('')
+        ax_inset.set_xlim(0, self.Chapa.c.magnitude*1.2)  # Zoom opcional
+        ax_inset.set_ylim(0, self.Viga.h.magnitude*1.2)
+        ax_inset.set_xticks([])
+        ax_inset.set_yticks([])
+
+        # Salvando a imagem no local correto      
+        if not self.dev_mode:
+                plt.savefig(os.path.join(self.settings.DATASET_URL,'img',f'img_{index}.png'))
+                
+        
+        # Mostrando o gráfico combinado
+        if show:
                 plt.show()
+                        
 
     def boltShear(self, Corte='Rosca') -> float:
         '''
@@ -660,9 +685,3 @@ class EndPLate:
 
     def plateWelding(self):
         pass
-
- 
-if __name__ == '__main__':
-    
-    pass
-

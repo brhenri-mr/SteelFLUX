@@ -27,10 +27,10 @@ parafuso = Conector(d_b=16,  f_ub=825)
 
 chapa = Plate(name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
 
-conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120)
+conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=False)
 
 
-conexao.plotConnection()
+conexao.plotConnection(show=False, index=1)
 
 '''
 for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5/8"', 'CH 3/4"', 'CH 7/8"' ]:

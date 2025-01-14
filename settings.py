@@ -7,3 +7,5 @@ class Settings(BaseSettings):
     )
 
     DATABASE_URL: str
+    DATASET_URL: str
+    TAMANHO_IMG: int
