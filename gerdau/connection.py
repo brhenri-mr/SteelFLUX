@@ -140,14 +140,14 @@ class EndPLate:
                         xytext=(self.Chapa.c.magnitude*1.1, self.Viga.h.magnitude*1.20), 
                         arrowprops={'arrowstyle': '<->'})
                 
-                ax.text(width*0.5, self.Viga.h.magnitude*1.25, f'L = {self.Chapa.c.magnitude}', ha='center', va='center',fontsize=8) 
+                ax.text(width*0.5, self.Viga.h.magnitude*1.25, f'L = {round(self.Chapa.c.magnitude, 2)}', ha='center', va='center',fontsize=8) 
                 
                 ax.annotate('', 
                         xy=(width/2 - self.g_ch.magnitude/2, self.Viga.h.magnitude*1.12), 
                         xytext=(width/2 + self.g_ch.magnitude/2, self.Viga.h.magnitude*1.12), 
                         arrowprops={'arrowstyle': '<->'})
                 
-                ax.text(width*0.5, self.Viga.h.magnitude*1.15, f'{self.g_ch.magnitude}', ha='center', va='center',fontsize=8) 
+                ax.text(width*0.5, self.Viga.h.magnitude*1.15, f'{round(self.g_ch.magnitude, 2)}', ha='center', va='center',fontsize=8) 
         
         
         #--------------------------------------- Adicionar cota Vertical-------------------------------------
@@ -156,7 +156,7 @@ class EndPLate:
                     xytext=(self.Chapa.c.magnitude*0.07, self.Viga.h.magnitude*1.1), 
                     arrowprops={'arrowstyle': '<->'})
         
-        ax.text(self.Chapa.c.magnitude*0.00000001, height*0.5, f'{self.Viga.h.magnitude}', 
+        ax.text(self.Chapa.c.magnitude*0.00000001, height*0.5, f'{round(self.Viga.h.magnitude, 2)}', 
                                                                         ha='left', va='center', rotation=90)
         ## Definicao do e inferior
         ax.annotate('', 
@@ -165,7 +165,7 @@ class EndPLate:
                     arrowprops={'arrowstyle': '<->'})
         
         ax.text(self.Chapa.c.magnitude*1.16, (self.Viga.h.magnitude*0.1 + 0.5*self.e.magnitude), 
-                                                f'{self.e.magnitude}', ha='left', va='center',rotation=90)
+                                                f'{round(self.e.magnitude,2)}', ha='left', va='center',rotation=90)
         
         ## Definicao do e superior
         ax.annotate('', 
@@ -174,7 +174,7 @@ class EndPLate:
                     arrowprops={'arrowstyle': '<->'})
         
         ax.text(self.Chapa.c.magnitude*1.16, (self.Viga.h.magnitude*1.1 - 0.5*self.e.magnitude), 
-                                                f'{self.e.magnitude}', ha='left', va='center',rotation=90)
+                                                f'{round(self.e.magnitude,2)}', ha='left', va='center',rotation=90)
         
         # Definição das cotas intermediárias
         for i in range(int(self.n_ps/2 - 1)):
@@ -189,7 +189,7 @@ class EndPLate:
         
                 ax.text(self.Chapa.c.magnitude*1.16, 
                         (self.Viga.h.magnitude*0.1 + self.e.magnitude + (((i)*2 + 1)*self.s.magnitude)/2), 
-                                                f'{self.s.magnitude}', ha='left', va='center',rotation=90)
+                                                f'{round(self.s.magnitude,2)}', ha='left', va='center',rotation=90)
                 
         
         #---------------------------------------------------------------------------------------------------
@@ -330,6 +330,7 @@ class EndPLate:
         
         return ax
 
+
     def mask(self):
         '''
         Método para geração da mascara da imagem da conexão
@@ -351,12 +352,10 @@ class EndPLate:
                 for chave,pontos in self.pontos_ancoragem.items():
                         if chave == 'Chapa':
                                 start = (int(tamanho + pontos['Final'][0]), tamanho - int(pontos['Start'][1]*1.85))
-                                end = (int(tamanho + pontos['Start'][0]*1.5), int(tamanho - 0.35*(pontos['Final'][1]) + start[1]))
-                                print(start, end)
+                                end = (int(tamanho + pontos['Start'][0]*1.56), int(tamanho - 0.35*(pontos['Final'][1]) + start[1]))
                         else:
                                 start = (int(tamanho*1.8 - pontos['Start'][0]), 0)
-                                end = (int(tamanho*2.5), int(tamanho*1.12 - pontos['Final'][1]))
-                                print(start, end)
+                                end = (int(tamanho*2.5), int(tamanho*1.13 - pontos['Final'][1]))
                         img = cv2.rectangle(img, start, end, color=(255, 255, 255), thickness=-1)
                 
                 # Salvando imagem
