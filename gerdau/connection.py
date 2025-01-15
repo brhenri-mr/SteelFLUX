@@ -274,7 +274,6 @@ class EndPLate:
         
         # Salvando ponto de ancoragem do elemento
         self.pontos_ancoragem['Chapa'] = {'Start':chapa_ponto_init,'Final':chapa_ponto_final}
-        print(self.pontos_ancoragem)
         ax.add_patch(rect)
         # ---------------------------------VIGA-----------------------------------------------------
         mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
@@ -351,14 +350,14 @@ class EndPLate:
                 # Iterando sobre os pontos
                 for chave,pontos in self.pontos_ancoragem.items():
                         if chave == 'Chapa':
-                                start = (int(tamanho + pontos['Start'][0]), tamanho - int(pontos['Start'][1]*1.85))
-                                end = (int(tamanho) + int(pontos['Final'][0]), int(tamanho - 0.35*(pontos['Final'][1]) + start[1]))
+                                start = (int(tamanho + pontos['Final'][0]), tamanho - int(pontos['Start'][1]*1.85))
+                                end = (int(tamanho + pontos['Start'][0]*1.5), int(tamanho - 0.35*(pontos['Final'][1]) + start[1]))
                                 print(start, end)
                         else:
-                                start = (tamanho - int(pontos['Start'][0]), tamanho - int(pontos['Start'][1]))
-                                end = (tamanho - int(pontos['Final'][0]), tamanho - int(pontos['Final'][1]))
+                                start = (int(tamanho*1.8 - pontos['Start'][0]), 0)
+                                end = (int(tamanho*2.5), int(tamanho*1.12 - pontos['Final'][1]))
                                 print(start, end)
-                        img = cv2.rectangle(img, start, end, color=(0, 0, 0), thickness=-1)
+                        img = cv2.rectangle(img, start, end, color=(255, 255, 255), thickness=-1)
                 
                 # Salvando imagem
                 cv2.imwrite(os.path.join(r'dataset/img_mask', f'{self.uuid}.{self.settings.EXT}'), img)
