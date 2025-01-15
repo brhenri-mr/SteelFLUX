@@ -35,6 +35,9 @@ class Dados():
     # Quantidade de parafusos
     qntd_parafusos: Mapped[int]
     
+    # Solicitacao
+    solicitacao:Mapped[float]
+    
     # Fator de segurança
     fs: Mapped[float]
     

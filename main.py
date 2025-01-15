@@ -4,6 +4,9 @@ import pandas as pd
 from gerdau.db import load_data
 from uuid import uuid4
 
+solicitacao = 80 # KN
+
+
 saida = pd.DataFrame(columns=['Perfil', 'Chapa', 'Bitola','Material', 's', 'Parafuso', 'Block', 
                               'ShearPlate', 'PlateCrush', 'boltShear', 'webShear', 'FS'])
 
@@ -72,7 +75,7 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
 
                               #web = conexao.beamWebShear()
 
-                              FS = 80/min(block, Vrd, F_vRd, F).magnitude
+                              FS = solicitacao/min(block, Vrd, F_vRd, F).magnitude
                               
                               ret = load_data(nome_perfil = 'W150x13',
                                           nome_chapa = chapa_tipo,
@@ -86,7 +89,8 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                                           shear_plate = Vrd,
                                           plate_crush = F,
                                           web_shear = 0,
-                                          uuid=uuid)
+                                          uuid=uuid,
+                                          solicitacao=solicitacao,)
       
                               conexao.plotConnection(show=False)
                               conexao.mask()

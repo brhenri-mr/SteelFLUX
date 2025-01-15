@@ -16,7 +16,8 @@ def load_data(nome_perfil:str,
               plate_crush:float,
               bolt_shear:float,
               web_shear:float,
-              uuid:UUID):
+              uuid:UUID,
+              solicitacao:float):
     '''
     Função que carrega os dados para o banco de dados SQL
     
@@ -46,6 +47,7 @@ def load_data(nome_perfil:str,
                     fs=fs,
                     uuid=uuid,
                     stress=new_stress,
+                    solicitacao=solicitacao
                     )
         
         with Session(create_engine(Settings().DATABASE_URL)) as session:
