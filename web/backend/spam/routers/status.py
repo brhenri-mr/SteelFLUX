@@ -32,19 +32,19 @@ def models(session=Depends(get_session)):
     except:
         return HTTPException(status_code=HTTPStatus.BAD_GATEWAY)
 
-@router.get('/{model}/{version}', response_model=TrainingDate)
-def log(model:str, version:int, session=Depends(get_session)):
+@router.get('/{model}/{name}/{version}', response_model=TrainingDate)
+def log(model:str, name:str, version:int, session=Depends(get_session)):
     '''
     Endpoint para recuperar loggs do sistema
     '''
     
-    name = session.execute(select(Models.uuid).where(Models.category == model).where(Models.version == version)).scalars().first()
-    if name:
+    name_uuid = session.execute(select(Models.uuid).where(Models.category == model).where(Models.name == name).where(Models.versao == version)).scalars().first()
+    if name_uuid:
         # Caminho para o log
-        path = os.path.join(Settings().LOG, f'{name}.log')
+        path = os.path.join(Settings().LOG, f'{name_uuid}.log')
         
         if os.path.isfile(path):
-             return FileResponse(path=path,media_type="text/plain",filename=f"{name}.log")
+             return FileResponse(path=path,media_type="text/plain",filename=f"{name_uuid}.log")
         
         else:
             return HTTPStatus.NOT_FOUND

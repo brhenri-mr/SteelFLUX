@@ -1,0 +1,15 @@
+=== INÍCIO DO LOG ===
+Model: Flux Test.v01
+id: ceb6e022-dfbf-4de2-bf4d-a519e7a12b4a
+Data: 2025-01-19 17:11:56
+Hipeparâmteros:
+epoch: 100
+bach_size: 200
+========================================
+2025-01-19 17:11:56,795 - INFO - O treinamento foi iniciado.
+2025-01-19 17:11:56,795 - INFO - Registrando novo modelo
+2025-01-19 17:11:56,800 - INFO - Treinamento finalizado com sucesso
+2025-01-19 17:12:45,464 - INFO - Shutting down
+2025-01-19 17:12:45,567 - INFO - Waiting for application shutdown.
+2025-01-19 17:12:45,567 - INFO - Application shutdown complete.
+2025-01-19 17:12:45,567 - INFO - Finished server process [18340]

@@ -9,16 +9,17 @@ import logging.config
 import logging
 from settings import Settings
 import os 
+from spam.utils.log import log_init
 
 router = APIRouter(prefix='/train', tags=['Train'])
 
 
-@router.post('/{model}/{version}')
-def train(model:str, version:int, db: Training, session=Depends(get_session)):
+@router.post('/{model}/{name}/{version}')
+async def train(model:str,name:str, version:int, db: Training, session=Depends(get_session)):
     try:
         
         # Verificando se o modelo existe 
-        path = session.execute(select(Models.path).where(Models.category == model).where(Models.version == version)).scalars().first()
+        modelo = session.execute(select(Models).where(Models.category == model).where(Models.name == name).where(Models.versao == version)).scalars().first()
         
         # Iniciando o identificador unico
         name_uuid = uuid4()
@@ -26,7 +27,14 @@ def train(model:str, version:int, db: Training, session=Depends(get_session)):
         # Caminho do log
         log_path = os.path.join(Settings().LOG,f'{name_uuid}.log')
         
-        if path:
+        log_init(version = version+1,
+                 category=model,
+                 nome=name,
+                 hip=db,
+                 uuid=name_uuid,
+                 path=log_path)
+        
+        if modelo:
             # Configurando o log
             logging.basicConfig(
                 filename=log_path,  # Salvar no arquivo com nome dinâmico
@@ -37,14 +45,14 @@ def train(model:str, version:int, db: Training, session=Depends(get_session)):
             # Recuperando o caminho do modelo
             
             # Iniciando o treinamento
+            logging.info("O treinamento foi iniciado.")
             
-            # sistema de logs
-            
+            logging.info("Registrando novo modelo")
             # Cadastrando novo modelo
             new_db = Models(uuid=name_uuid,
                             category=model,
-                            name='1231',
-                            status='',
+                            name=name,
+                            status='idle',
                             versao=version+1,
                             )
             
@@ -52,6 +60,7 @@ def train(model:str, version:int, db: Training, session=Depends(get_session)):
             session.commit()
             session.refresh(new_db)
             
+            logging.info("Treinamento finalizado com sucesso")
             return HTTPStatus.OK
         
         else:

@@ -25,9 +25,6 @@ class TrainingDate(BaseModel):
 
 class Training(BaseModel):
     
-    # Name
-    name: str
-    
     # Quantidade de epocas
     epoch: int
     

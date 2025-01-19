@@ -30,12 +30,12 @@ def log_init(version:int, category:str, nome:str, hip:dict, uuid:UUID, path:str)
     header += "Data: {:%Y-%m-%d %H:%M:%S}\n".format(datetime.now())
     header += "Hipeparâmteros:\n"
     
-    for chave, valor in hip.items():
+    for chave, valor in dict(hip).items():
         header += f'{chave}: {valor}\n'
     
     header += "=" * 40 + "\n"
         
-    with open(os.path.join(path, f'{uuid}.log'), 'w') as arquivo:
+    with open(path, 'w') as arquivo:
         arquivo.write(header)
     
     return 1
