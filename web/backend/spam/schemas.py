@@ -36,3 +36,15 @@ class Training(BaseModel):
     bach_size: int
     
     # 1
+
+class ModelAuth(BaseModel):
+    
+    # nome
+    name: str
+    
+    # category
+    category: str
+    
+    # 
+    
+

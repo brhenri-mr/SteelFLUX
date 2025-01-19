@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from http import HTTPStatus
 from sqlalchemy import select
 from spam.models import Models
-from spam.routers import status, train, predict
+from spam.routers import status, train, predict, auth
 import os
 from spam.database import get_session
 
@@ -10,6 +10,7 @@ app = FastAPI()
 app.include_router(status.router)
 app.include_router(train.router)
 app.include_router(predict.router)
+app.include_router(auth.router)
 
 
 @app.get('/')

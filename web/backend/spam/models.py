@@ -32,8 +32,3 @@ class Models():
     
     # Versão
     versao: Mapped[int]
-    
-    # Caminho do arquivo
-    path: Mapped[str]
-
-
