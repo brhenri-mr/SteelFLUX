@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["brhenri-mr <superbr55@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["standard"], version = "^0.115.6"}
+pytask = "^0.5.2"
+sqlalchemy = "^2.0.37"
+alembic = "^1.14.0"
+pydantic = "^2.10.5"
+pydantic-settings = "^2.7.1"
+
+
+[tool.taskipy.tasks]
+run = "fastapi dev spam/app.py"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
