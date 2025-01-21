@@ -15,7 +15,7 @@ router = APIRouter(prefix='/status', tags=['Status'])
 
 
 @router.get('/', response_model=TrainingDate)
-def models(session=Depends(get_session)):
+async def models(session=Depends(get_session)):
     try:
         # recuperando dados do modelo
         train_model = session.execute(select(Models.status).where(Models.status == 'Train')).scalars().all()
@@ -33,7 +33,7 @@ def models(session=Depends(get_session)):
         return HTTPException(status_code=HTTPStatus.BAD_GATEWAY)
 
 @router.get('/{model}/{name}/{version}', response_model=TrainingDate)
-def log(model:str, name:str, version:int, session=Depends(get_session)):
+async def log(model:str, name:str, version:int, session=Depends(get_session)):
     '''
     Endpoint para recuperar loggs do sistema
     '''

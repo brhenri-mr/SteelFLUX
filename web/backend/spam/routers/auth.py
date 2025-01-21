@@ -10,7 +10,7 @@ router = APIRouter(prefix='/auth', tags=['Auth'])
 
 
 @router.post('/')
-def cadastro(db: ModelAuth, session=Depends(get_session)):
+async def cadastro(db: ModelAuth, session=Depends(get_session)):
     try:
         new_db = Models(uuid=uuid4(),
                         name=db.name,
