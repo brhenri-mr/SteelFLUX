@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.11"
 streamlit = "^1.41.1"
 pytask = "^0.5.2"
+requests = "^2.32.3"
 
 [tool.taskipy.tasks]
 run = "streamlit run app/main.py"

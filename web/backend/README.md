@@ -1,3 +1,7 @@
+# Objetivo
+
+Integrar com o Hugginface, necessidade real
+
 ## Auth
 
 Router para controlar os cadastro da api
