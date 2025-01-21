@@ -43,5 +43,13 @@ class ModelAuth(BaseModel):
     category: str
     
     # 
-    
 
+class ImageMetadata(BaseModel):
+    #Tensão de tração
+    sigma:float
+    
+    # Cisalhamento
+    tau:float
+    
+    #Viga
+    section:str

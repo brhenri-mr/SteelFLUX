@@ -29,7 +29,7 @@ Router para treinamentodos diferentes modelos
 
 - [x] Sistema de log
 - [x] Sistema de cadastro do modelo
-- [-] Acesso ao banco de dados
+- [-] Acesso ao banco de dados dee treino (outro arquivo)
 - [-] Treinamento do modelo
 - [-] Arquivamento de pesos
 
