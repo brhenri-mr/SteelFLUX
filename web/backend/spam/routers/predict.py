@@ -37,7 +37,7 @@ async def predict(model: str,
                 
             # Caso o nome não seja reconhecido
             raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Modelo não reconhecido")
-         
+        
         else:
             # Se o modelo não for encontrado no banco de dados
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Modelo não encontrado")
