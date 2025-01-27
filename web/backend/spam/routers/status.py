@@ -16,6 +16,9 @@ router = APIRouter(prefix='/status', tags=['Status'])
 
 @router.get('/', response_model=TrainingDate)
 async def models(session=Depends(get_session)):
+    '''
+    EndPoint com informação do modelo treinando
+    '''
     try:
         # recuperando dados do modelo
         train_model = session.execute(select(Models.status).where(Models.status == 'Train')).scalars().all()

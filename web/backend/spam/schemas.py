@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import List, Tuple
 
 class TrainingDate(BaseModel):
     # mensagem de treino
@@ -53,3 +54,7 @@ class ImageMetadata(BaseModel):
     
     #Viga
     section:str
+
+
+class ModelsName(BaseModel):
+    Name: List[Tuple[str, int]]

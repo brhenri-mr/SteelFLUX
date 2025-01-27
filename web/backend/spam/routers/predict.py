@@ -29,22 +29,22 @@ async def predict(model:str,
         #context = f'''sigma={metadados.sigma}, tau={metadados.tau}, perfil={metadados.section}'''
         
         # Verificando se o modelos existe
-        date = session.execute(select(Models).where(Models.name == name)).scalars().first()
+        db_uuid = session.execute(select(Models.uuid).where(Models.name == name)).scalars().first()
         
         
         # Fazendo as verificações
-        if date:
+        if db_uuid:
             # Retornar a msg
             match name:
                 case 'FLUXControlnetInpainting':
-                    pass
+                    ret, path = fluxInpaintinRun(image_path=1, mask_path=1, prompt=1, uuid=db_uuid)
                     
             return 1
         
         else:
             return HTTPException(HTTPStatus.NOT_FOUND)
         
-    except:
-        return HTTPException(HTTPStatus.BAD_REQUEST)
+    except Exception as e:
+        return HTTPException(HTTPStatus.BAD_REQUEST, detail=str(e))
     
     

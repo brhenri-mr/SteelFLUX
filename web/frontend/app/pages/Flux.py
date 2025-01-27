@@ -1,8 +1,36 @@
 import streamlit as st
 import time 
 import random
+import requests
+import json
 
 st.set_page_config(layout="wide")
+
+if 'MODELS' not in st.session_state:
+    # Definindo variaveis
+    valores_versoes = {}
+    names = []
+    
+    # Fazendo a requisição ao sistema
+    response = requests.get('http://127.0.0.1:8000/model/Flux')
+    
+    # Tratando valores
+    MODELS_NAME = json.loads(response.content.decode("utf-8"))
+    
+    # Recuperando valores
+    for element in list(MODELS_NAME.values())[0]:
+        names.append(element[0])
+        if names[-1] in valores_versoes.keys():
+            valores_versoes[names[-1]].append(element[1])
+        else:
+            valores_versoes[names[-1]] = [element[1]]
+    
+    # Distribuindo valores
+    st.session_state['MODELS'] = names
+    st.session_state['VERSAO'] = valores_versoes
+    
+
+
 
 
 
@@ -19,18 +47,24 @@ def generate_progress_bar(progress:int, total=100, length=25)->str:
     bar = '#' * filled_length + '-' * (length - filled_length)
     return f"|{bar}| {progress}%"
 
-
-models = ['1']
-
 col1, col2 = st.columns(2)
 
 with col1:
     TRAIN_MODE = st.toggle('Train')
 
-    option = st.selectbox(
-        "Modelos disponíveis",
-        models,
-    )
+    modelos, versoes = st.columns(2)
+    
+    with modelos:
+    
+        option = st.selectbox(
+            "Modelos disponíveis",
+            st.session_state['MODELS'],
+        )
+    with versoes:
+        version = st.selectbox(
+            "Versões disponíveis",
+            st.session_state['VERSAO'][option],
+        )
 
 
     if TRAIN_MODE:
@@ -57,11 +91,16 @@ with col1:
         pass
     
     else:
-        uploaded_files = st.file_uploader(
+        IMG_ROOT = st.file_uploader(
         "Carregue a imagem", accept_multiple_files=True
     )
+        
+        IMG_MASK = st.file_uploader(
+            "Carregue a mascara", accept_multiple_files=True
+        )
+        
         # Mostrando imagem carregada
-        if uploaded_files:
+        if IMG_ROOT:
             st.image('')
 
 start = st.button('Run')
@@ -102,9 +141,13 @@ with col2:
                 status.update(label="Treinamento concluido", state="complete", expanded=False)
                 st.toast('Treinamento realizado com Sucesso✅')
     else:
+        
+        #requests.post('http://127.0.0.1:8000/predict/flux/FLUXControlnetInpainting/0')
+        
         ## Carregar resultado
-        if uploaded_files and start:
-            st.image()
+        #if uploaded_files and start:
+            #st.image()
+        pass
         
 
 
