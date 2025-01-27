@@ -12,7 +12,7 @@ if 'MODELS' not in st.session_state:
     names = []
     
     # Fazendo a requisição ao sistema
-    response = requests.get('http://127.0.0.1:8000/model/Flux')
+    response = requests.get('http://localhost:8000/model/Flux')
     
     # Tratando valores
     MODELS_NAME = json.loads(response.content.decode("utf-8"))
@@ -141,8 +141,11 @@ with col2:
                 status.update(label="Treinamento concluido", state="complete", expanded=False)
                 st.toast('Treinamento realizado com Sucesso✅')
     else:
+
+        files = {'file_1': (IMG_ROOT.name, IMG_ROOT, 'image/png'),
+                 'file_2': (IMG_MASK.name, IMG_MASK, 'image/png')}
         
-        #requests.post('http://127.0.0.1:8000/predict/flux/FLUXControlnetInpainting/0')
+        requests.post(f'http://localhost:8000/predict/flux/{option}/{version}', files=files)
         
         ## Carregar resultado
         #if uploaded_files and start:
