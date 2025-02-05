@@ -21,39 +21,43 @@ async def models(session=Depends(get_session)):
     '''
     try:
         # recuperando dados do modelo
-        train_model = session.execute(select(Models.status).where(Models.status == 'Train')).scalars().all()
-        
-        return TrainingDate(msg='Train',
-                 model=train_model.name,
-                 time=1,
-                 data=datetime.now(),
-                 percentage=1,
-                 epoch=1,
-                 status=200)
-        
+        train_model = session.execute(select(Models.status).where(Models.status == 'Train')).scalars().first()
+        if train_model:
+            return TrainingDate(msg='Train',
+                    model=train_model.name,
+                    time=1,
+                    data=datetime.now(),
+                    percentage=1,
+                    epoch=1,
+                    status=200)
+            
+        else:
+            raise HTTPException(HTTPStatus.NO_CONTENT, detail='Não há modelos treinando')
     
-    except:
-        return HTTPException(status_code=HTTPStatus.BAD_GATEWAY)
+    except Exception as e :
+        return HTTPException(status_code=HTTPStatus.BAD_GATEWAY, detail=str(e))
 
 @router.get('/{model}/{name}/{version}', response_model=TrainingDate)
 async def log(model:str, name:str, version:int, session=Depends(get_session)):
     '''
     Endpoint para recuperar loggs do sistema
     '''
-    
-    name_uuid = session.execute(select(Models.uuid).where(Models.category == model).where(Models.name == name).where(Models.versao == version)).scalars().first()
-    if name_uuid:
-        # Caminho para o log
-        path = os.path.join(Settings().LOG, f'{name_uuid}.log')
-        
-        if os.path.isfile(path):
-             return FileResponse(path=path,media_type="text/plain",filename=f"{name_uuid}.log")
+    try:
+        name_uuid = session.execute(select(Models.uuid).where(Models.category == model).where(Models.name == name).where(Models.versao == version)).scalars().first()
+        if name_uuid:
+            # Caminho para o log
+            path = os.path.join(Settings().LOG, f'{name_uuid}.log')
+            
+            if os.path.isfile(path):
+                return FileResponse(path=path,media_type="text/plain",filename=f"{name_uuid}.log")
+            
+            else:
+                raise HTTPStatus.NOT_FOUND
         
         else:
-            return HTTPStatus.NOT_FOUND
-    
-    else:
-        return HTTPStatus.NOT_FOUND
+            raise HTTPStatus.NOT_FOUND
+    except Exception as e:
+        return HTTPException(HTTPStatus.BAD_REQUEST, detail=str(e))
 
 
 

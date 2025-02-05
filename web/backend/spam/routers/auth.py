@@ -23,7 +23,7 @@ async def cadastro(db: ModelAuth, session=Depends(get_session)):
         session.commit()
         session.refresh(new_db)
         
-        return HTTPStatus.OK
+        return new_db
     
     except Exception as e:
         return HTTPException(status_code=HTTPStatus.BAD_GATEWAY, detail=str(e))

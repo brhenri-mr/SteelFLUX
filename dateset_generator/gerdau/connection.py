@@ -347,6 +347,8 @@ class EndPLate:
         if os.path.isfile(arquivo):
                 # Carregando a imagem
                 img = cv2.imread(arquivo)
+                # Criar uma imagem preta do mesmo tamanho
+                img = np.zeros_like(img)
                 
                 # Iterando sobre os pontos
                 for chave,pontos in self.pontos_ancoragem.items():

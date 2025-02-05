@@ -141,15 +141,15 @@ with col2:
                 status.update(label="Treinamento concluido", state="complete", expanded=False)
                 st.toast('Treinamento realizado com Sucesso✅')
     else:
-
-        files = {'file_1': (IMG_ROOT.name, IMG_ROOT, 'image/png'),
-                 'file_2': (IMG_MASK.name, IMG_MASK, 'image/png')}
-        
-        requests.post(f'http://localhost:8000/predict/flux/{option}/{version}', files=files)
-        
-        ## Carregar resultado
-        #if uploaded_files and start:
-            #st.image()
+        if IMG_ROOT and IMG_MASK:
+            files = {'file_1': (IMG_ROOT.name, IMG_ROOT, 'image/png'),
+                    'file_2': (IMG_MASK.name, IMG_MASK, 'image/png')}
+            
+            requests.post(f'http://localhost:8000/predict/flux/{option}/{version}', files=files)
+            
+            ## Carregar resultado
+            #if uploaded_files and start:
+                #st.image()
         pass
         
 
