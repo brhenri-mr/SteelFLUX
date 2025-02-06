@@ -37,13 +37,13 @@ class Training(BaseModel):
 
 class ModelAuth(BaseModel):
     
-    # nome
     name: str
-    
-    # category
     category: str
-    
-    # 
+    status: str
+    storage_path:str
+    extension:str
+    description:str
+    version:str
 
 class ImageMetadata(BaseModel):
     #Tensão de tração

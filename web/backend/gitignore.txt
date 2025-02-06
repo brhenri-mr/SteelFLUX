@@ -1,0 +1,11 @@
+# Ignorar arquivos .pyc
+*.pyc
+
+# Ignorar diretórios __pycache__
+__pycache__/
+versions/
+
+# Ignorar outros arquivos temporários do Python
+*.pyo
+*.pyd
+*.db

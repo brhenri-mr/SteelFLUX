@@ -3,7 +3,7 @@ from sqlalchemy import select
 from http import HTTPStatus
 from spam.schemas import Training
 from spam.database import get_session
-from spam.models import Models
+from spam.models import Modelos
 from uuid import uuid4
 import logging.config
 import logging
@@ -19,7 +19,7 @@ async def train(model:str,name:str, version:int, db: Training, session=Depends(g
     try:
         
         # Verificando se o modelo existe 
-        modelo = session.execute(select(Models).where(Models.category == model).where(Models.name == name).where(Models.versao == version)).scalars().first()
+        modelo = session.execute(select(Modelos).where(Modelos.category == model).where(Modelos.name == name).where(Modelos.versao == version)).scalars().first()
         
         # Iniciando o identificador unico
         name_uuid = uuid4()
@@ -49,11 +49,14 @@ async def train(model:str,name:str, version:int, db: Training, session=Depends(g
             
             logging.info("Registrando novo modelo")
             # Cadastrando novo modelo
-            new_db = Models(uuid=name_uuid,
+            new_db = Modelos(uuid=name_uuid,
                             category=model,
                             name=name,
                             status='idle',
-                            versao=version+1,
+                            storage_path='hhtp',
+                            extension='.pkg',
+                            description='Gerador de imagens',
+                            versao=f'v.{version+1}',
                             )
             
             session.add(new_db)

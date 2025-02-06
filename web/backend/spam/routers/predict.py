@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Body
 from http import HTTPStatus
-from spam.models import Models
+from spam.models import Modelos
 from sqlalchemy import select
 from spam.database import get_session
 import os 
@@ -24,7 +24,7 @@ async def predict(model: str,
     '''
     try:
         # Verificando se o modelo existe
-        db_uuid = session.execute(select(Models.uuid).where(Models.name == name)).scalars().first()
+        db_uuid = session.execute(select(Modelos.uuid).where(Modelos.name == name)).scalars().first()
         
         # Fazendo as verificações
         if db_uuid:

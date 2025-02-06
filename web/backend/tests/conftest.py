@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 from spam.models import table_registry
 from spam.database import get_session
-from spam.models import Models
+from spam.models import Modelos
 from uuid import uuid4
 
 
@@ -38,19 +38,22 @@ def session():
 
     # Deletando os dados em memoria -> tear down
     table_registry.metadata.drop_all(engine)
-    
+
+
 @pytest.fixture()
 def model(session):
-    
-    model = Models(uuid=uuid4(),
-                       name='Test',
-                       category='Flux',
-                       status='Train',
-                       versao=0)
-    
+
+    model = Modelos(status='Train',
+                    name='Test',
+                    category='Flux',
+                    version='v0',
+                    storage_path='hhtp',
+                    extension='.pkl',
+                    description='Opa sou um test',
+                    uuid=str(uuid4()))
+
     session.add(model)
     session.commit()
     session.refresh(model)
-    
-    return model
 
+    return model

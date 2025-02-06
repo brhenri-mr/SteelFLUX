@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 from http import HTTPStatus
 from spam.database import get_session
 from sqlalchemy import select
-from spam.models import Models
+from spam.models import Modelos
 from spam.schemas import TrainingDate
 from datetime import datetime
 import os
@@ -21,7 +21,7 @@ async def models(session=Depends(get_session)):
     '''
     try:
         # recuperando dados do modelo
-        train_model = session.execute(select(Models.status).where(Models.status == 'Train')).scalars().first()
+        train_model = session.execute(select(Modelos.status).where(Modelos.status == 'Train')).scalars().first()
         if train_model:
             return TrainingDate(msg='Train',
                     model=train_model.name,
@@ -43,7 +43,7 @@ async def log(model:str, name:str, version:int, session=Depends(get_session)):
     Endpoint para recuperar loggs do sistema
     '''
     try:
-        name_uuid = session.execute(select(Models.uuid).where(Models.category == model).where(Models.name == name).where(Models.versao == version)).scalars().first()
+        name_uuid = session.execute(select(Modelos.uuid).where(Modelos.category == model).where(Modelos.name == name).where(Modelos.versao == version)).scalars().first()
         if name_uuid:
             # Caminho para o log
             path = os.path.join(Settings().LOG, f'{name_uuid}.log')
