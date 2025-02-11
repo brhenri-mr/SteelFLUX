@@ -1,7 +1,7 @@
-from gerdau.elements import Plate, Conector, Beam, Column
-from gerdau.connection import EndPLate
+from generator.elements import Plate, Conector, Beam, Column
+from generator.connection import EndPLate
 import pandas as pd
-from gerdau.db import load_data
+from generator.db import load_data
 from uuid import uuid4
 
 solicitacao = 80 # KN

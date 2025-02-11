@@ -1,6 +1,8 @@
 # Objetivo
 
-Integrar com o Hugginface, necessidade real
+Acesso aos modelos treinados/campeões do MLFlow. O BackEnd será responsável apenas
+pela interação entre usuário e modelo no MLFlow. Não sendo seu papel o TREINAMENTO de modelo ou CADASTRO de novos modelos. A principio seu papel é unicamente a predição dos valores já existente no servidor do MLFLOW
+
 
 ## Auth
 
@@ -17,7 +19,7 @@ Previsão do modelo
 
 - [-] Integração com o banco de dados
 - [-] API para o hugginface
-- [-] Acesso a modelos
+- [-] Acesso a modelos via MLflow
 
 ## Status
 Demonstra os status da aplicação
@@ -39,7 +41,7 @@ Router para treinamentodos diferentes modelos
 
 ## Utils.log
 
-Inicializa o arquivo de log 
+Inicializa o arquivo de log -- TALVEZ SEJA DELETADO
 
 - [x] Cabeçalho automático
 - [x] Caminho automático

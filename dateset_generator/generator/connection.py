@@ -1,8 +1,8 @@
 import numpy as np
-from gerdau.unit import unit
+from generator.unit import unit
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from gerdau.plot import breakline
+from generator.plot import breakline
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from settings import Settings
 import os

@@ -1,5 +1,5 @@
-from gerdau.connection import EndPLate
-from gerdau.elements import Column, Conector, Beam, Plate
+from generator.connection import EndPLate
+from generator.elements import Column, Conector, Beam, Plate
 
 chapa = Plate(name='1/4"',
               c= 200,

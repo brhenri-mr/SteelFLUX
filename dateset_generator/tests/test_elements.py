@@ -1,4 +1,4 @@
-from gerdau.elements import Column, Conector, Beam, Plate
+from generator.elements import Column, Conector, Beam, Plate
 import pint
 
 def test_column():

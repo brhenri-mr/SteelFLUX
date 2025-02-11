@@ -1,4 +1,4 @@
-from gerdau.mask import mask_generate
+from generator.mask import mask_generate
 
 
 

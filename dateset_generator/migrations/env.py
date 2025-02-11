@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from gerdau.models import table_registry
+from generator.models import table_registry
 from settings import Settings
 
 # this is the Alembic Config object, which provides

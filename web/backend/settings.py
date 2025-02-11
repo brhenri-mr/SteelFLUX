@@ -9,3 +9,4 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     LOG: str
     MODELS: str
+    DATABASE_TRAIN_URL: str

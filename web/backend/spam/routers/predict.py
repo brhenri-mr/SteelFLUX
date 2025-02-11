@@ -7,11 +7,11 @@ import os
 from settings import Settings
 from spam.schemas import ImageMetadata
 
-# importando modelos
-from spam.iamodels.FLUXControlnetInpainting.main import fluxInpaintinRun
 
 
 router = APIRouter(prefix='/predict', tags=['predict'])
+
+### PRECISA SER REESCRITO PARA SER COMPATIBILZIADO COM O MLFLOW
 
 @router.post('/{model}/{name}/{version}')
 async def predict(model: str, 
