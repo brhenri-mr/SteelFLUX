@@ -116,6 +116,30 @@ class Column:
         self.tf = tf*unit[Dimension_unit]
 
 
+class CornerFrame:
+    def __init__(self, 
+                     t_c:float, 
+                     fy:float,
+                     lc:float,
+                     Resistence_unit='megapascal',
+                     Dimension_unit='millimeter'):
+        '''
+        Parameters:
+        ----------
+        * tc: float
+                Espessura da chama
+        * fy: float
+                Resistência a escoamento 
+        * lc: float
+                Comprimento da ligação
+        
+        '''
+        self.t_c = t_c*unit[Dimension_unit]
+        self.lc = lc*unit[Dimension_unit]# Comprimento da ligação
+        self.fy = fy*unit[Resistence_unit]
+
+        
+
 if __name__ == '__main__':
     test = Conector(1,2)
     test1 = test.f_ub*test.d_b*test.d_b

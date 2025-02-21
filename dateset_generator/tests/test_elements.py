@@ -1,4 +1,4 @@
-from generator.elements import Column, Conector, Beam, Plate
+from generator.elements import Column, Conector, Beam, Plate, CornerFrame
 import pint
 
 def test_column():
@@ -60,12 +60,12 @@ def test_plate():
     Teste da classe: valores de entrada, recebimento e devolução
     '''
     # Entradas
-    entrada = {'t_ch':1,
+    entrada = {'t_ch':6.35,
                'f_uc':1,
                'f_yc':1,
                'c':1}
     
-    chapa = Plate(t_ch=entrada['t_ch'],
+    chapa = Plate(name='CH 1/4"',
                   f_uc=entrada['f_uc'],
                   f_yc=entrada['f_yc'],
                   c=entrada['c'],
@@ -73,7 +73,7 @@ def test_plate():
     
     # Obtendo os parâmetros da classe
     saida = chapa.__dict__
-    
+
     # Varificação das entradas
     for chave in entrada.keys():
         if isinstance(saida[chave],pint.Quantity):
@@ -107,6 +107,35 @@ def test_beam():
     
     # Obtendo os parâmetros da classe
     saida = viga.__dict__
+    
+    # Varificação das entradas
+    for chave in entrada.keys():
+        if isinstance(saida[chave],pint.Quantity):
+            value = saida[chave].magnitude
+        
+        else:
+            value = saida[chave]
+        
+        assert value == entrada[chave], 'Valores de entrada errada'
+
+
+def test_conerframe():
+    '''
+    Teste da classe: valores de entrada, recebimento e devolução
+    '''
+    # Entradas
+    entrada = {'t_c':1,
+               'fy':1,
+               'lc':1,
+               }
+    
+    cantoneira = CornerFrame(fy=entrada['fy'],
+                       lc=entrada['lc'],
+                       t_c=entrada['t_c']
+                    )
+    
+    # Obtendo os parâmetros da classe
+    saida = cantoneira.__dict__
     
     # Varificação das entradas
     for chave in entrada.keys():
