@@ -132,7 +132,56 @@ class PlateChecker:
         return min(v_bruta, v_liquida).to(self.Result_unit)
 
 
-class EndPLate(BoltChecker, PlateChecker):
+class BeamChecker:
+
+    def __init__(self, 
+                 n_ps:float,
+                 Viga,
+                 s:float,
+                 Dimension_unit='millimeter',
+                 Result_unit='kilonewton',
+                 coef1=1.1
+                 ):
+            
+        self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
+        self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
+        self.Result_unit = Result_unit
+        self.coef1 = coef1
+  
+    def beamWebShear(self):
+        '''
+        Status Verificado
+        -----------------
+        
+        Cálculo do cisalhamento na alma da viga apoiada - Viga
+        (NBR 8800:2008 – item 6.5.5.a) 
+        
+        Parameters
+        ---------
+        
+        * fy: Float
+                Resistência ao escoamento do aço
+        * n_ps: int
+                Quantidade de parafusos na conexão
+        * tw: float
+                Espessura da alma da viga
+        * e: float
+                Distância entre a extermidade da placa e o parafuso
+        * s: float
+                Distância entre parafusos consecutivos 
+        Return
+        ------
+        Resistência ao cortante 
+        
+        '''
+        # Área bruta da seção
+        ag = ((self.n_ps*0.5 - 1)*self.s + 2*self.e)*self.Viga.tw
+        
+        return (0.6*self.Viga.fy*ag/self.coef1).to(self.Result_unit)
+
+
+
+class EndPLate(BoltChecker, PlateChecker, BeamChecker):
     
     def __init__(self,
                  Conector, 
@@ -146,6 +195,7 @@ class EndPLate(BoltChecker, PlateChecker):
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton',
                  coef=1.35,
+                 coef1=1.1,
                  dev_mode=True) -> None:
         '''
         Status Não Testado
@@ -178,6 +228,7 @@ class EndPLate(BoltChecker, PlateChecker):
         # Chamando os construtores das classes pai diretamente
         BoltChecker.__init__(self, Conector, n_ps, coef, Result_unit)
         PlateChecker.__init__(self, n_ps, Conector, Viga, s, Dimension_unit, Result_unit, coef)
+        BeamChecker.__init__(self, n_ps, Viga, s, Dimension_unit, Result_unit, coef1)
 
          
         # Classes
@@ -201,7 +252,6 @@ class EndPLate(BoltChecker, PlateChecker):
         # Admensional
         self.n_ps = n_ps # Quantidade de parafusos
         self.coef = coef
-        self.coef1 = 1.1
 
         self.TAMANHO = Settings().TAMANHO_IMG
         
@@ -611,38 +661,6 @@ class EndPLate(BoltChecker, PlateChecker):
         return sum(saida).to(self.Result_unit), saida
 
 
-    def beamWebShear(self):
-        '''
-        Status Verificado
-        -----------------
-        
-        Cálculo do cisalhamento na alma da viga apoiada - Viga
-        (NBR 8800:2008 – item 6.5.5.a) 
-        
-        Parameters
-        ---------
-        
-        * fy: Float
-                Resistência ao escoamento do aço
-        * n_ps: int
-                Quantidade de parafusos na conexão
-        * tw: float
-                Espessura da alma da viga
-        * e: float
-                Distância entre a extermidade da placa e o parafuso
-        * s: float
-                Distância entre parafusos consecutivos 
-        Return
-        ------
-        Resistência ao cortante 
-        
-        '''
-        # Área bruta da seção
-        ag = ((self.n_ps*0.5 - 1)*self.s + 2*self.e)*self.Viga.tw
-        
-        return (0.6*self.Viga.fy*ag/self.coef1).to(self.Result_unit)
-
-
     def plateBearing(self):
         '''
         Flexão da chapa de extremidade
@@ -741,8 +759,18 @@ class EndPLate(BoltChecker, PlateChecker):
         pass
 
 
-class LCPP(BoltChecker):
-    pass
+class LCPP(BoltChecker, BeamChecker):
+    def __init__(self, Conector,
+                 Viga, 
+                 n_ps:float,
+                 s:float, 
+                 coef=1.35, 
+                 coef1=1.1,
+                 Dimension_unit='',
+                 Result_unit='kilonewton'):
+         
+        BoltChecker.__init__(self, Conector, n_ps, coef, Result_unit)
+        BeamChecker.__init__(self, n_ps, Viga, s, Dimension_unit, Result_unit, coef1)
 
 
 

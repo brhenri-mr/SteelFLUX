@@ -1,5 +1,5 @@
 from generator.elements import Column, Conector, Beam, Plate, CornerFrame
-from generator.connection import BoltChecker, PlateChecker
+from generator.connection import BoltChecker, PlateChecker, BeamChecker
 import pint
 
 def test_column():
@@ -186,3 +186,6 @@ def test_platechecker(parafuso, viga ):
                                 Viga=entrada['Viga'],
                                 s=entrada['s'])
 
+
+def test_beamchecker(viga, ):
+    beamchecker = BeamChecker(n_ps=6,s=60, Viga=viga)
