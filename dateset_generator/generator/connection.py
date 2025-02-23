@@ -63,8 +63,76 @@ class BoltChecker:
                 return (0.5*a_b*self.Parafuso.f_ub*self.n_ps/self.coef).to(self.Result_unit)
 
 
+class PlateChecker:
+    def __init__(self, 
+                 n_ps:float,
+                 Conector,
+                 Viga,
+                 s:float, 
+                 Dimension_unit='millimeter',
+                 Result_unit='kilonewton',
+                 coef=1.35
+                 ):
+        self.d_h = Conector.d_b + 1.5*unit['millimeter'] # Diametro de furo
+        self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
+        self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
+        self.Result_unit = Result_unit
+        self.coef = coef
+    
+    
+    def plateShear(self):
+        ''' 
+        Status Verificado
+        -----------------
+        
+        Função para cálculo do cisalhametno da chapa de extermidade bruta e liquída
+        
+        Parameters
+        ----------
+        * f_yc: float
+                Resistência de cálculo ao escoamento da chapa
+        
+        * f_uc: float
+                Limite de resistência a tração do aço do elemento de ligação (cantoneira ou chapa 
+                
+        * t_ch: float
+                Espessura da chapa de extremidade
 
-class EndPLate:
+        * n_ps: int
+                Número de parafusos na chapa de extremidade  
+        
+        * s: float
+                Distância vertical entre furos
+
+        * e: float
+                Distância vertical entre furo e borda; excentricidade em placas de base (Md/Nd)
+        
+        * d_h: float
+                Diâmetro do furo
+                
+        * coef: float
+                Coeficiente de ponderação
+        Return
+        ------
+        Resistência de cálculo ao cisalhamento da placa, o mínimo entre as duas resistências
+        
+        '''
+        # Área bruta da seção 
+        ag = ((0.5*self.n_ps - 1)*self.s + 2*self.e)*self.Chapa.t_ch
+        
+        v_bruta = 2*0.6*self.Chapa.f_yc*ag/self.coef1
+        
+        # Resistência da seção liquída
+        # Ver NBR 8800:2008 - Item 5.2.4.1
+        anv = (self.n_ps*0.5*(self.d_h + 2*unit['millimeter'])*self.Chapa.t_ch)
+         
+        v_liquida = 2*0.6*self.Chapa.f_uc*(ag - anv)/self.coef
+        
+        
+        return min(v_bruta, v_liquida).to(self.Result_unit)
+
+
+class EndPLate(BoltChecker, PlateChecker):
     
     def __init__(self,
                  Conector, 
@@ -107,10 +175,11 @@ class EndPLate:
                 Identificador unico da conexão
         
         '''
-        # Herdando os atributos
-        super().__init__(Conector, n_ps, coef)
-        
-        
+        # Chamando os construtores das classes pai diretamente
+        BoltChecker.__init__(self, Conector, n_ps, coef, Result_unit)
+        PlateChecker.__init__(self, n_ps, Conector, Viga, s, Dimension_unit, Result_unit, coef)
+
+         
         # Classes
         self.Chapa = Plate
         self.Viga = Viga
@@ -118,9 +187,6 @@ class EndPLate:
         self.Coluna = Coluna
         
         # Dados
-        self.d_h = Conector.d_b + 1.5*unit['millimeter'] # Diametro de furo
-        self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
-        self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
         
         assert self.e.magnitude>0, 'Distância entre furos (s) está superando o comprimento da chapa'
         
@@ -545,58 +611,6 @@ class EndPLate:
         return sum(saida).to(self.Result_unit), saida
 
 
-    def plateShear(self):
-        ''' 
-        Status Verificado
-        -----------------
-        
-        Função para cálculo do cisalhametno da chapa de extermidade bruta e liquída
-        
-        Parameters
-        ----------
-        * f_yc: float
-                Resistência de cálculo ao escoamento da chapa
-        
-        * f_uc: float
-                Limite de resistência a tração do aço do elemento de ligação (cantoneira ou chapa 
-                
-        * t_ch: float
-                Espessura da chapa de extremidade
-
-        * n_ps: int
-                Número de parafusos na chapa de extremidade  
-        
-        * s: float
-                Distância vertical entre furos
-
-        * e: float
-                Distância vertical entre furo e borda; excentricidade em placas de base (Md/Nd)
-        
-        * d_h: float
-                Diâmetro do furo
-                
-        * coef: float
-                Coeficiente de ponderação
-        Return
-        ------
-        Resistência de cálculo ao cisalhamento da placa, o mínimo entre as duas resistências
-        
-        '''
-        # Área bruta da seção 
-        ag = ((0.5*self.n_ps - 1)*self.s + 2*self.e)*self.Chapa.t_ch
-        
-        v_bruta = 2*0.6*self.Chapa.f_yc*ag/self.coef1
-        
-        # Resistência da seção liquída
-        # Ver NBR 8800:2008 - Item 5.2.4.1
-        anv = (self.n_ps*0.5*(self.d_h + 2*unit['millimeter'])*self.Chapa.t_ch)
-         
-        v_liquida = 2*0.6*self.Chapa.f_uc*(ag - anv)/self.coef
-        
-        
-        return min(v_bruta, v_liquida).to(self.Result_unit)
-
-
     def beamWebShear(self):
         '''
         Status Verificado
@@ -643,34 +657,6 @@ class EndPLate:
         l_fch = (0.5*self.n_ps - 1)*self.s + 2*self.e
         
         return (((4*self.Chapa.t_ch*l_fch**2)/(6*self.g_ch)*self.Chapa.f_yc)/self.coef1).to(self.Result_unit)
-
-        
-    def dunkerStability(self, v_d):
-        '''
-        Cálculo da envoltória da resistência pela interação de dunker
-        VERIFICAR SE ISSO É UTIL DE VDD
-        '''
-        v_x = 1*unit[self.Result_unit]/unit['millimeter']
-        l_fch = (0.5*self.n_ps - 1)*self.s + 2*self.e
-        v_dm = v_d/2*unit[self.Result_unit]   
-        v_z = v_dm/(2*l_fch)
-        t_lich = v_z/(0.6*self.Chapa.f_yc/1.1)
-        v_ox = 0.6*self.Chapa.f_yc*(self.Chapa.t_ch - t_lich)/1.1
-        m_oz = 0.25*(self.Chapa.t_ch**2 - t_lich**2)*self.Chapa.f_yc/1.1
-           
- 
-        
-        for _ in range(100):
-                 
-                
-                m_z = 0.25*v_x*(self.g_ch - self.Viga.tw)
-                
-                
-                v_x = v_ox*(1 - m_oz/m_z)**(1/4)
-        
-        nd = 2*l_fch*v_x
-        
-        return m_z/m_oz + (v_x/v_ox)**4
 
 
     def blockShear(self, cts=1):
@@ -755,7 +741,7 @@ class EndPLate:
         pass
 
 
-class LCPP:
+class LCPP(BoltChecker):
     pass
 
 

@@ -1,5 +1,5 @@
 from generator.elements import Column, Conector, Beam, Plate, CornerFrame
-from generator.connection import BoltChecker
+from generator.connection import BoltChecker, PlateChecker
 import pint
 
 def test_column():
@@ -173,5 +173,16 @@ def test_boltchecker(parafuso):
         assert value == entrada[chave], 'Valores de entrada errada'
     
 
-
+def test_platechecker(parafuso, viga ):
+    
+    entrada = {'Parafuso':parafuso,
+               'n_ps':6,
+               'Viga':viga,
+               's':60
+               }
+    
+    platechecker = PlateChecker(Conector=entrada['Parafuso'],
+                                n_ps=entrada['n_ps'],
+                                Viga=entrada['Viga'],
+                                s=entrada['s'])
 
