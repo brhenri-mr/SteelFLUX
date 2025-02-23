@@ -1,4 +1,5 @@
 from generator.elements import Column, Conector, Beam, Plate, CornerFrame
+from generator.connection import BoltChecker
 import pint
 
 def test_column():
@@ -146,3 +147,31 @@ def test_conerframe():
             value = saida[chave]
         
         assert value == entrada[chave], 'Valores de entrada errada'
+
+
+def test_boltchecker(parafuso):
+    
+    entrada = {'Parafuso':parafuso,
+               'n_ps':6,
+               }
+    
+    
+    boltchecker = BoltChecker(Conector=entrada['Parafuso'],
+                n_ps=entrada['n_ps'])
+    
+    # Obtendo os parâmetros da classe
+    saida = boltchecker.__dict__
+    
+    # Varificação das entradas
+    for chave in entrada.keys():
+        if isinstance(saida[chave],pint.Quantity):
+            value = saida[chave].magnitude
+        
+        else:
+            value = saida[chave]
+        
+        assert value == entrada[chave], 'Valores de entrada errada'
+    
+
+
+

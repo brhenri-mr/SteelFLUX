@@ -10,6 +10,60 @@ from uuid import UUID
 
 import cv2
 
+
+class BoltChecker:
+    '''
+    Classe para verificação dos parafusos, independente do conjunto
+    '''
+    def __init__(self, 
+                 Conector, 
+                 n_ps:int,
+                 coef=1.35,
+                 Result_unit='kilonewton'):
+            
+        self.Parafuso = Conector
+        self.coef = coef
+        self.n_ps = n_ps
+        self.Result_unit = Result_unit
+        
+        
+    def boltShear(self, Corte='Rosca') -> float:
+        '''
+        Status Verificado
+        -----------------
+        
+        Cálculo da Cortante no grupo de parafusos segundo NBR 8800:2008 item 6.3.3.2
+        
+        Parameters
+        ----------
+        
+        * d_b: float
+                Diâmetro do parafuso
+        * F_ub: float
+                Resistência última do parafuso
+        * n_ps: int
+                Número de parafusos na chapa de extremidade
+        * coef: float
+                coeficiente de ponderação
+        
+        Return
+        ------
+        Resistência de cáluclo a cortante do parafuso
+        '''
+        # Área do parafuso
+        a_b = 0.25*np.pi*self.Parafuso.d_b**2
+        
+        # Determinação do local de corte do parafuso
+        match Corte:
+            case 'Conservador':
+                return (0.4*a_b*self.Parafuso.f_ub*self.n_ps/self.coef).to(self.Result_unit)
+            case 'Rosca':
+                return (0.4*a_b*self.Parafuso.f_ub*self.n_ps/self.coef).to(self.Result_unit)
+            case 'Fuste':
+                return (0.5*a_b*self.Parafuso.f_ub*self.n_ps/self.coef).to(self.Result_unit)
+
+
+
 class EndPLate:
     
     def __init__(self,
@@ -17,8 +71,8 @@ class EndPLate:
                  Plate, 
                  Viga,
                  Coluna, 
-                 n_ps:int,
                  s:float,
+                 n_ps:float,
                  g_ch:float,
                  uuid:UUID,
                  Dimension_unit='millimeter',
@@ -53,10 +107,14 @@ class EndPLate:
                 Identificador unico da conexão
         
         '''
+        # Herdando os atributos
+        super().__init__(Conector, n_ps, coef)
+        
+        
         # Classes
         self.Chapa = Plate
         self.Viga = Viga
-        self.Parafuso = Conector
+
         self.Coluna = Coluna
         
         # Dados
@@ -420,42 +478,6 @@ class EndPLate:
         # Mostrando o gráfico combinado
         if show:
                 plt.show()
-                        
-
-    def boltShear(self, Corte='Rosca') -> float:
-        '''
-        Status Verificado
-        -----------------
-        
-        Cálculo da Cortante no grupo de parafusos segundo NBR 8800:2008 item 6.3.3.2
-        
-        Parameters
-        ----------
-        
-        * d_b: float
-                Diâmetro do parafuso
-        * F_ub: float
-                Resistência última do parafuso
-        * n_ps: int
-                Número de parafusos na chapa de extremidade
-        * coef: float
-                coeficiente de ponderação
-        
-        Return
-        ------
-        Resistência de cáluclo a cortante do parafuso
-        '''
-        # Área do parafuso
-        a_b = 0.25*np.pi*self.Parafuso.d_b**2
-        
-        # Determinação do local de corte do parafuso
-        match Corte:
-            case 'Conservador':
-                return (0.4*a_b*self.Parafuso.f_ub*self.n_ps/self.coef).to(self.Result_unit)
-            case 'Rosca':
-                return (0.4*a_b*self.Parafuso.f_ub*self.n_ps/self.coef).to(self.Result_unit)
-            case 'Fuste':
-                return (0.5*a_b*self.Parafuso.f_ub*self.n_ps/self.coef).to(self.Result_unit)
 
 
     def plateCrush(self) ->float:
@@ -731,3 +753,11 @@ class EndPLate:
 
     def plateWelding(self):
         pass
+
+
+class LCPP:
+    pass
+
+
+
+
