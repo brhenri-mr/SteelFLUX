@@ -63,12 +63,13 @@ class BoltChecker:
                 return (0.5*a_b*self.Parafuso.f_ub*self.n_ps/self.coef).to(self.Result_unit)
 
 
-class PlateChecker:
+class BasicConnection:
     def __init__(self, 
                  n_ps:float,
                  Conector,
                  Viga,
                  s:float, 
+                 Conectante,
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton',
                  coef=1.35
@@ -78,6 +79,7 @@ class PlateChecker:
         self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
         self.Result_unit = Result_unit
         self.coef = coef
+        self.Conectante = Conectante
     
     
     def plateShear(self):
@@ -132,6 +134,70 @@ class PlateChecker:
         return min(v_bruta, v_liquida).to(self.Result_unit)
 
 
+    def plateCrush(self) ->float:
+        '''
+        Status Verificado
+        -----------------
+        
+        Cálculo do pressão de contato do elemento conector para o conjunto de parafusos
+        NBR880:2008. item 6.3.3.3
+        
+        Parameters
+        ----------
+        
+        * d_b: float
+                Diâmetro do parafuso
+        
+        * t_ch: float
+                Espessura da chapa de extremidade
+
+        * f_uc: float
+                Limite de resistência a tração do aço do elemento de ligação (cantoneira ou chapa 
+
+        * n_ps: int
+                Número de parafusos na chapa de extremidade  
+        
+        * s: float
+                Distância vertical entre furos
+
+        * e: float
+                Distância vertical entre furo e borda; excentricidade em placas de base (Md/Nd)
+
+        * d_h: float
+                Diâmetro do furo
+
+        * coef: float
+                Coeficiente de ponderação
+        
+        
+        Return
+        ------
+        * saida: float
+                Resistência mínima da chapa a pressão de contato incluindo rasgamento e esmagamento
+        
+        * individual: lista
+                Lista com as resistência indiviuais de cada região conectada
+        '''
+        # Quantidade de regiões q eu tenho
+        times = int(2+self.n_ps/2-1)
+        saida = [] # Lista com os valores individuais
+        
+        # O calculo é feito para cada parafuso
+        for i in range(times):
+
+                crush = 2.4*self.Parafuso.d_b*self.Conectante.t_ch*self.Conectante.f_uc/self.coef
+                if i == 0 or i == times - 1:
+                        # Furo Externo
+                        crush_hole = 1.2*(self.s - self.d_h)*self.Conectante.t_ch*self.Conectante.f_uc/self.coef
+                else:
+                        # Furo interna
+                        crush_hole = 1.2*(self.e - 0.5*self.d_h)*self.Conectante.t_ch*self.Conectante.f_uc/self.coef
+                
+                saida.append(min(crush,crush_hole).to(self.Result_unit))   
+                
+        
+        return sum(saida).to(self.Result_unit), saida
+
 class BeamChecker:
 
     def __init__(self, 
@@ -181,7 +247,7 @@ class BeamChecker:
 
 
 
-class EndPLate(BoltChecker, PlateChecker, BeamChecker):
+class EndPLate(BoltChecker, BasicConnection, BeamChecker):
     
     def __init__(self,
                  Conector, 
@@ -227,7 +293,18 @@ class EndPLate(BoltChecker, PlateChecker, BeamChecker):
         '''
         # Chamando os construtores das classes pai diretamente
         BoltChecker.__init__(self, Conector, n_ps, coef, Result_unit)
-        PlateChecker.__init__(self, n_ps, Conector, Viga, s, Dimension_unit, Result_unit, coef)
+        
+        # Instanciando uma conexão básica
+        BasicConnection.__init__(self, n_ps= n_ps, 
+                                 Conector=Conector, 
+                                 Viga=Viga, 
+                                 s= s, 
+                                 Dimension_unit=Dimension_unit, 
+                                 Result_unit=Result_unit,
+                                 coef=coef,
+                                 Conectante=Plate)
+        
+        
         BeamChecker.__init__(self, n_ps, Viga, s, Dimension_unit, Result_unit, coef1)
 
          
@@ -596,71 +673,6 @@ class EndPLate(BoltChecker, PlateChecker, BeamChecker):
                 plt.show()
 
 
-    def plateCrush(self) ->float:
-        '''
-        Status Verificado
-        -----------------
-        
-        Cálculo do pressão de contato da chapa para o conjunto de parafusos
-        NBR880:2008. item 6.3.3.3
-        
-        Parameters
-        ----------
-        
-        * d_b: float
-                Diâmetro do parafuso
-        
-        * t_ch: float
-                Espessura da chapa de extremidade
-
-        * f_uc: float
-                Limite de resistência a tração do aço do elemento de ligação (cantoneira ou chapa 
-
-        * n_ps: int
-                Número de parafusos na chapa de extremidade  
-        
-        * s: float
-                Distância vertical entre furos
-
-        * e: float
-                Distância vertical entre furo e borda; excentricidade em placas de base (Md/Nd)
-
-        * d_h: float
-                Diâmetro do furo
-
-        * coef: float
-                Coeficiente de ponderação
-        
-        
-        Return
-        ------
-        * saida: float
-                Resistência mínima da chapa a pressão de contato incluindo rasgamento e esmagamento
-        
-        * individual: lista
-                Lista com as resistência indiviuais de cada região conectada
-        '''
-        # Quantidade de regiões q eu tenho
-        times = int(2+self.n_ps/2-1)
-        saida = [] # Lista com os valores individuais
-        
-        # O calculo é feito para cada parafuso
-        for i in range(times):
-
-                crush = 2.4*self.Parafuso.d_b*self.Chapa.t_ch*self.Chapa.f_uc/self.coef
-                if i == 0 or i == times - 1:
-                        # Furo Externo
-                        crush_hole = 1.2*(self.s - self.d_h)*self.Chapa.t_ch*self.Chapa.f_uc/self.coef
-                else:
-                        # Furo interna
-                        crush_hole = 1.2*(self.e - 0.5*self.d_h)*self.Chapa.t_ch*self.Chapa.f_uc/self.coef
-                
-                saida.append(min(crush,crush_hole).to(self.Result_unit))   
-                
-        
-        return sum(saida).to(self.Result_unit), saida
-
-
     def plateBearing(self):
         '''
         Flexão da chapa de extremidade
@@ -771,7 +783,8 @@ class LCPP(BoltChecker, BeamChecker):
          
         BoltChecker.__init__(self, Conector, n_ps, coef, Result_unit)
         BeamChecker.__init__(self, n_ps, Viga, s, Dimension_unit, Result_unit, coef1)
-
-
+   
+   
+   
 
 
