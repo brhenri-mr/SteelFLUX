@@ -118,25 +118,29 @@ class Column:
 
 class CornerFrame:
     def __init__(self, 
-                     t_c:float, 
-                     fy:float,
+                     t_ch:float, 
+                     f_yc:float,
+                     f_uc:float,
                      lc:float,
                      Resistence_unit='megapascal',
                      Dimension_unit='millimeter'):
         '''
         Parameters:
         ----------
-        * tc: float
+        * t_ch: float
                 Espessura da chama
-        * fy: float
-                Resistência a escoamento 
+        * f_yc: float
+                Resistência caracteristica do aço a escoamento 
+        * f_uc: float
+                Resistência caracterisitca do aço a ruptura
         * lc: float
                 Comprimento da ligação
         
         '''
-        self.t_c = t_c*unit[Dimension_unit]
+        self.t_ch = t_ch*unit[Dimension_unit]
         self.lc = lc*unit[Dimension_unit]# Comprimento da ligação
-        self.fy = fy*unit[Resistence_unit]
+        self.f_yc = f_yc*unit[Resistence_unit]
+        self.f_uc = f_uc*unit[Resistence_unit]
 
         
 

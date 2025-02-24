@@ -125,14 +125,16 @@ def test_conerframe():
     Teste da classe: valores de entrada, recebimento e devolução
     '''
     # Entradas
-    entrada = {'t_c':1,
-               'fy':1,
+    entrada = {'t_ch':1,
+               'f_yc':1,
+               'f_uc':1,
                'lc':1,
                }
     
-    cantoneira = CornerFrame(fy=entrada['fy'],
-                       lc=entrada['lc'],
-                       t_c=entrada['t_c']
+    cantoneira = CornerFrame(f_yc=entrada['f_yc'],
+                             f_uc=entrada['f_uc'],
+                            lc=entrada['lc'],
+                            t_ch=entrada['t_ch']
                     )
     
     # Obtendo os parâmetros da classe

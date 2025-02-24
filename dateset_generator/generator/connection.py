@@ -87,7 +87,7 @@ class BasicConnection:
         Status Verificado
         -----------------
         
-        Função para cálculo do cisalhametno da chapa de extermidade bruta e liquída
+        Função para cálculo do cisalhamento da chapa de extermidade bruta e liquída
         
         Parameters
         ----------
@@ -120,15 +120,15 @@ class BasicConnection:
         
         '''
         # Área bruta da seção 
-        ag = ((0.5*self.n_ps - 1)*self.s + 2*self.e)*self.Chapa.t_ch
+        ag = ((0.5*self.n_ps - 1)*self.s + 2*self.e)*self.Conectante.t_ch
         
-        v_bruta = 2*0.6*self.Chapa.f_yc*ag/self.coef1
+        v_bruta = 2*0.6*self.Conectante.f_yc*ag/self.coef1
         
         # Resistência da seção liquída
         # Ver NBR 8800:2008 - Item 5.2.4.1
-        anv = (self.n_ps*0.5*(self.d_h + 2*unit['millimeter'])*self.Chapa.t_ch)
+        anv = (self.n_ps*0.5*(self.d_h + 2*unit['millimeter'])*self.Conectante.t_ch)
          
-        v_liquida = 2*0.6*self.Chapa.f_uc*(ag - anv)/self.coef
+        v_liquida = 2*0.6*self.Conectante.f_uc*(ag - anv)/self.coef
         
         
         return min(v_bruta, v_liquida).to(self.Result_unit)
@@ -869,8 +869,23 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         
         
     def AngleCrush(self):
+        '''
+        Status Verificado
+        -----------------
+        
+        Cálculo do pressão de contato do elemento conector para o conjunto de parafusos
+        NBR880:2008. item 6.3.3.3
+        '''
         return 2*super().plateCrush()
    
    
-
+    def angleShear(self):
+        ''' 
+        Status Verificado
+        -----------------
+        
+        Função para cálculo do cisalhamento da chapa de extermidade bruta e liquída
+        '''
+        
+        return 2*super().plateShear()
 
