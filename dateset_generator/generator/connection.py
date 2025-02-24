@@ -198,6 +198,7 @@ class BasicConnection:
         
         return sum(saida).to(self.Result_unit), saida
 
+
 class BeamChecker:
 
     def __init__(self, 
@@ -213,6 +214,7 @@ class BeamChecker:
         self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
         self.Result_unit = Result_unit
         self.coef1 = coef1
+        self.Viga = Viga
   
     def beamWebShear(self):
         '''
@@ -245,6 +247,67 @@ class BeamChecker:
         
         return (0.6*self.Viga.fy*ag/self.coef1).to(self.Result_unit)
 
+
+    def crushBeam(self):
+        '''
+        Cálculo do Rasgamento/Pressão de contato na alma da viga apoiada conector para o conjunto de parafusos
+        NBR880:2008. item 6.3.3.3
+        
+        Parameters
+        ----------
+        
+        * d_b: float
+                Diâmetro do parafuso
+        
+        * t_ch: float
+                Espessura da chapa de extremidade
+
+        * f_uc: float
+                Limite de resistência a tração do aço do elemento de ligação (cantoneira ou chapa 
+
+        * n_ps: int
+                Número de parafusos na chapa de extremidade  
+        
+        * s: float
+                Distância vertical entre furos
+
+        * e: float
+                Distância vertical entre furo e borda; excentricidade em placas de base (Md/Nd)
+
+        * d_h: float
+                Diâmetro do furo
+
+        * coef: float
+                Coeficiente de ponderação
+        
+        
+        Return
+        ------
+        * saida: float
+                Resistência mínima da chapa a pressão de contato incluindo rasgamento e esmagamento
+        
+        * individual: lista
+                Lista com as resistência indiviuais de cada região conectada
+        '''
+        # Quantidade de regiões q eu tenho
+        times = int(2+self.n_ps/2-1)
+        saida = [] # Lista com os valores individuais
+        
+        # O calculo é feito para cada parafuso
+        for i in range(times):
+
+                crush = 2.4*self.Parafuso.d_b*self.Viga.tw*self.Viga.fu/self.coef
+                if i == 0 or i == times - 1:
+                        # Furo Externo
+                        crush_hole = 1.2*(self.s - self.d_h)*self.Viga.tw*self.Viga.fu/self.coef
+                else:
+                        # Furo interna
+                        crush_hole = 1.2*(self.e - 0.5*self.d_h)*self.Viga.tw*self.Viga.fu/self.coef
+                
+                saida.append(min(crush,crush_hole).to(self.Result_unit))   
+                
+        
+        return sum(saida).to(self.Result_unit), saida
 
 
 class EndPLate(BoltChecker, BasicConnection, BeamChecker):
@@ -767,13 +830,23 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         
         return (f_rRd/self.coef).to(self.Result_unit)
 
+
+    def crushBeam(self):
+        # Proteger contra a verificação da alama da viga
+        raise AttributeError('O cálculo da pressão de contato na viga apoiada não é aplicada a esse tipo de conexão') 
+
+
     def plateWelding(self):
         pass
 
 
-class LCPP(BoltChecker, BeamChecker):
+class LCPP(BoltChecker, BeamChecker, BasicConnection):
+    '''
+    Classe ded ligação metálicas estrutural flexível Dupla cantoneira
+    '''
     def __init__(self, Conector,
                  Viga, 
+                 Angle,
                  n_ps:float,
                  s:float, 
                  coef=1.35, 
@@ -783,7 +856,20 @@ class LCPP(BoltChecker, BeamChecker):
          
         BoltChecker.__init__(self, Conector, n_ps, coef, Result_unit)
         BeamChecker.__init__(self, n_ps, Viga, s, Dimension_unit, Result_unit, coef1)
-   
+        
+        # Instanciando uma conexão básica
+        BasicConnection.__init__(self, n_ps= n_ps, 
+                                 Conector=Conector, 
+                                 Viga=Viga, 
+                                 s= s, 
+                                 Dimension_unit=Dimension_unit, 
+                                 Result_unit=Result_unit,
+                                 coef=coef,
+                                 Conectante=Angle)
+        
+        
+    def AngleCrush(self):
+        return 2*super().plateCrush()
    
    
 
