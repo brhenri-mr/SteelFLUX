@@ -1,6 +1,6 @@
 import pytest
-from generator.elements import Column, Conector, Beam, Plate
-from generator.connection import EndPLate
+from generator.elements import Column, Conector, Beam, Plate, CornerFrame
+from generator.connection import EndPLate, LCPP
 from uuid import uuid4
 
 
@@ -53,3 +53,26 @@ def conexao(parafuso, chapa, viga, coluna):
                     g_ch=120,
                     uuid=uuid4())
     return conexao
+
+1
+def cantoneira():
+    # Cadastrando um 2L 1/2"
+    cantoneira = CornerFrame(t_ch=3.18,
+                             f_yc=345,
+                             f_uc=400,
+                             lc=12.7)
+    return cantoneira
+
+
+def lcpp(cantoneira, coluna, viga, parafuso):
+    
+    lcpp = LCPP(
+        Viga=viga,
+        Coluna=coluna,
+        Angle=cantoneira,
+        n_ps=4,
+        s=60,
+        Conector=parafuso
+    )
+    
+    return lcpp

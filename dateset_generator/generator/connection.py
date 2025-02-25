@@ -67,20 +67,66 @@ class BasicConnection:
     def __init__(self, 
                  n_ps:float,
                  Conector,
+                 Coluna,
                  Viga,
                  s:float, 
                  Conectante,
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton',
-                 coef=1.35
+                 coef=1.35,
                  ):
+            
         self.d_h = Conector.d_b + 1.5*unit['millimeter'] # Diametro de furo
+        self.Coluna = Coluna
+        self.Viga = Viga
         self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
-        self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
+        self.e = (Viga.h - (n_ps/2 -1)*self.s)/2 # Distancia entre centro do furo e borda
         self.Result_unit = Result_unit
         self.coef = coef
         self.Conectante = Conectante
+        self.fig, self.ax = plt.subplots(figsize=(8, 6))
+        self.TAMANHO = Settings().TAMANHO_IMG
+        
+        # Inicializando o desenho padrão
+        self.plotBasic()
     
+    def plotBasic(self):
+        unit.setup_matplotlib()
+        self.ax.set_ylim(0, self.TAMANHO*1.17)  
+        
+        # -------------------------------Coluna Definição das Breakline-------------------------------
+        for altura in [1, self.TAMANHO]:
+                coord = list(zip(*breakline(-1, altura, 
+                                            length=self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude)))
+                self.ax.plot(coord[0],coord[1], color='black', linewidth=0.8)
+        
+        # -------------------------------Coluna Definição das mesas-------------------------------
+        for offset in [0, self.Coluna.h.magnitude + self.Coluna.tf.magnitude]:
+                
+                mesa2 = patches.Rectangle((1 + offset,1), 
+                                 self.Coluna.tf.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
+                self.ax.add_patch(mesa2)
+
+        coluna = patches.Rectangle((1 + self.Coluna.tf.magnitude,1), 
+                                 self.Coluna.h.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
+        self.ax.add_patch(coluna)
+        
+        # ---------------------------------VIGA-----------------------------------------------------
+        mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
+                                  self.TAMANHO/2 + self.Viga.h.magnitude/2), 
+                                 100, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
+        self.ax.add_patch(mesa1)
+        
+        mesa2 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
+                                  self.TAMANHO/2 - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude*1.6 ), 
+                                 100, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
+        self.ax.add_patch(mesa2)
+        
+        alma = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
+                                  self.TAMANHO/2 - self.Viga.h.magnitude/2), 
+                                 100, self.Viga.h.magnitude, edgecolor='black', facecolor='gray')
+        self.ax.add_patch(alma)
+
     
     def plateShear(self):
         ''' 
@@ -209,13 +255,14 @@ class BeamChecker:
                  Result_unit='kilonewton',
                  coef1=1.1
                  ):
-            
+
         self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
-        self.e = (Viga.h - (n_ps/2 -1)*s*unit[Dimension_unit])/2 # Distancia entre centro do furo e borda
+        self.e = (Viga.h - (n_ps/2 -1)*self.s)/2 # Distancia entre centro do furo e borda
         self.Result_unit = Result_unit
         self.coef1 = coef1
         self.Viga = Viga
-  
+
+
     def beamWebShear(self):
         '''
         Status Verificado
@@ -365,7 +412,8 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  Dimension_unit=Dimension_unit, 
                                  Result_unit=Result_unit,
                                  coef=coef,
-                                 Conectante=Plate)
+                                 Conectante=Plate,
+                                 Coluna=Coluna,)
         
         
         BeamChecker.__init__(self, n_ps, Viga, s, Dimension_unit, Result_unit, coef1)
@@ -404,6 +452,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         # Caso seja True, as imagens não serão salvar
         # Caso contrario, serão
         self.dev_mode = dev_mode
+
 
     def platePlot(self, ax=0, show=True): 
         # Criar uma figura e eixos
@@ -557,28 +606,8 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
 
     def plotView(self, show=True):
         unit.setup_matplotlib()
-        fig, ax = plt.subplots(figsize=(8, 6))
-        
-        ax.set_ylim(0, self.TAMANHO*1.17)  
-        
-        parafuso_interno = int((self.n_ps/2 - 1))
-        
-        # -------------------------------Coluna Definição das Breakline-------------------------------
-        for altura in [1, self.TAMANHO]:
-                coord = list(zip(*breakline(-1, altura, 
-                                            length=self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude)))
-                plt.plot(coord[0],coord[1], color='black', linewidth=0.8)
-        
-        # -------------------------------Coluna Definição das mesas-------------------------------
-        for offset in [0, self.Coluna.h.magnitude + self.Coluna.tf.magnitude]:
-                
-                mesa2 = patches.Rectangle((1 + offset,1), 
-                                 self.Coluna.tf.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
-                ax.add_patch(mesa2)
 
-        coluna = patches.Rectangle((1 + self.Coluna.tf.magnitude,1), 
-                                 self.Coluna.h.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
-        ax.add_patch(coluna)
+        parafuso_interno = int((self.n_ps/2 - 1))
         
         # ---------------------------------Chapa-----------------------------------------------------
         chapa_ponto_init = (self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1, self.TAMANHO/2 - self.Viga.h.magnitude/2 )
@@ -588,34 +617,19 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         
         # Salvando ponto de ancoragem do elemento
         self.pontos_ancoragem['Chapa'] = {'Start':chapa_ponto_init,'Final':chapa_ponto_final}
-        ax.add_patch(rect)
-        # ---------------------------------VIGA-----------------------------------------------------
-        mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
-                                  self.TAMANHO/2 + self.Viga.h.magnitude/2), 
-                                 100, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
-        ax.add_patch(mesa1)
-        
-        mesa2 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
-                                  self.TAMANHO/2 - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude*1.6 ), 
-                                 100, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
-        ax.add_patch(mesa2)
-        
-        alma = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
-                                  self.TAMANHO/2 - self.Viga.h.magnitude/2), 
-                                 100, self.Viga.h.magnitude, edgecolor='black', facecolor='gray')
-        ax.add_patch(alma)
+        self.ax.add_patch(rect)
         
         # ----------------------------------------Furos-----------------------------------------------------
         
         furo = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 , 
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2 + self.e.magnitude - self.d_h.magnitude/2), 
                                  self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, self.d_h.magnitude, edgecolor='black', facecolor='black')
-        ax.add_patch(furo)
+        self.ax.add_patch(furo)
         
         furo = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 , 
                                   self.TAMANHO/2 + self.Viga.h.magnitude/2 - self.e.magnitude - self.d_h.magnitude/2), 
                                  self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, self.d_h.magnitude, edgecolor='black', facecolor='black')
-        ax.add_patch(furo)
+        self.ax.add_patch(furo)
         
         for i in range(parafuso_interno-1):
                 
@@ -625,16 +639,16 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                 self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, 
                                 self.d_h.magnitude, 
                                 edgecolor='black', facecolor='black')
-                ax.add_patch(furo_interno)
+                self.ax.add_patch(furo_interno)
         
         
-        ax.annotate('', 
+        self.ax.annotate('', 
                     xy=(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*0.5, 
                         self.TAMANHO/2 + self.Viga.h.magnitude/2 ), 
                     xytext=(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude,
                             self.TAMANHO/2 + self.Viga.h.magnitude*0.65), 
                     arrowprops={'arrowstyle': '->'})
-        ax.text(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude,
+        self.ax.text(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude,
                 self.TAMANHO/2 + self.Viga.h.magnitude*0.65, f'CH {self.Chapa.t_ch.magnitude}', ha='left', va='center',)
         
         
@@ -642,7 +656,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         if show:
                 plt.show() # if you need...
         
-        return ax
+        return self.ax
 
 
     def mask(self):
@@ -847,16 +861,17 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
     def __init__(self, Conector,
                  Viga, 
                  Angle,
+                 Coluna,
                  n_ps:float,
                  s:float, 
                  coef=1.35, 
                  coef1=1.1,
-                 Dimension_unit='',
+                 Dimension_unit='millimeter',
                  Result_unit='kilonewton'):
          
         BoltChecker.__init__(self, Conector, n_ps, coef, Result_unit)
-        BeamChecker.__init__(self, n_ps, Viga, s, Dimension_unit, Result_unit, coef1)
-        
+
+
         # Instanciando uma conexão básica
         BasicConnection.__init__(self, n_ps= n_ps, 
                                  Conector=Conector, 
@@ -865,9 +880,47 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                                  Dimension_unit=Dimension_unit, 
                                  Result_unit=Result_unit,
                                  coef=coef,
-                                 Conectante=Angle)
+                                 Conectante=Angle,
+                                 Coluna=Coluna,)
         
         
+        BeamChecker.__init__(self, n_ps=n_ps, 
+                             Viga=Viga, 
+                             s=s,
+                             Dimension_unit= Dimension_unit, 
+                             Result_unit=Result_unit, 
+                             coef1=coef1)
+        
+        
+        assert Angle.lc.magnitude < Viga.h.magnitude, 'Cantoneira maior que alma da viga'
+    
+    def plotView(self, show=True):
+        unit.setup_matplotlib()
+        
+        #----------------------------------Vista Frontal da aba------------------------------------------
+        chapa_ponto_init = (self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1, self.TAMANHO/2 -self.Conectante.lc.magnitude/2)
+
+        aba_frontal = patches.Rectangle(chapa_ponto_init,
+                                 self.Conectante.t_ch.magnitude, self.Conectante.lc.magnitude, edgecolor='black', facecolor='#D3D3D3')
+        self.ax.add_patch(aba_frontal)
+        
+        #---------------------------------Vista lateral da aba-------------------
+        # Por causa da escala, pode parecer que os valores de x são superior aos de y
+        aba_lateral = patches.Rectangle((chapa_ponto_init[0] + self.Conectante.t_ch.magnitude, chapa_ponto_init[1]),
+                                          self.Conectante.lc.magnitude - self.Conectante.t_ch.magnitude, self.Conectante.lc.magnitude,
+                                         edgecolor='black', facecolor='#D3D3D3')
+        
+        self.ax.add_patch(aba_lateral)
+        self.ax.set_aspect('equal')
+        plt.axis('off')
+        if show:
+                plt.show() # if you need...
+        
+        return self.ax
+
+    
+    
+    
     def AngleCrush(self):
         '''
         Status Verificado

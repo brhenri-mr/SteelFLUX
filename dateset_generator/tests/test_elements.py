@@ -175,7 +175,7 @@ def test_boltchecker(parafuso):
         assert value == entrada[chave], 'Valores de entrada errada'
     
 
-def test_basicconncetions(parafuso, viga,  chapa):
+def test_basicconncetions(parafuso, viga,  chapa, coluna):
     
     entrada = {'Parafuso':parafuso,
                'n_ps':6,
@@ -187,7 +187,8 @@ def test_basicconncetions(parafuso, viga,  chapa):
                                 n_ps=entrada['n_ps'],
                                 Viga=entrada['Viga'],
                                 s=entrada['s'],
-                                Conectante=chapa)
+                                Conectante=chapa,
+                                Coluna=coluna)
 
 
 def test_beamchecker(viga, ):
