@@ -959,9 +959,65 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                                 edgecolor='black', facecolor='white')
                 
                 self.ax.add_patch(furo_interno) 
+        #-----------------------------------------------------------------------------------------------
+        # Definição das cotas intermediárias
+        
+             
+        self.ax.annotate('', 
+                    xy=(chapa_ponto_init[0] + self.Conectante.lc.magnitude+10, 
+                        chapa_ponto_init[1]), 
+                    
+                    xytext=(chapa_ponto_init[0] + self.Conectante.lc.magnitude + 10,
+                            chapa_ponto_init[1] + self.e.magnitude), 
+                    arrowprops={'arrowstyle': '<->'})
+        
+        self.ax.text(chapa_ponto_init[0] + self.Conectante.lc.magnitude + 12, 
+                        (chapa_ponto_init[1] + self.e.magnitude/2), 
+                                                f'{round(self.e.magnitude,2)}', ha='left', va='center',rotation=90)        
+        
+                     
+        self.ax.annotate('', 
+                    xy=(chapa_ponto_init[0] + self.Conectante.lc.magnitude+10, 
+                        chapa_ponto_init[1] + self.lc.magnitude - self.e.magnitude), 
+                    
+                    xytext=(chapa_ponto_init[0] + self.Conectante.lc.magnitude + 10,
+                            chapa_ponto_init[1] + self.lc.magnitude), 
+                    arrowprops={'arrowstyle': '<->'})
+        
+        self.ax.text(chapa_ponto_init[0] + self.Conectante.lc.magnitude + 12, 
+                        (chapa_ponto_init[1] +  self.lc.magnitude - self.e.magnitude/2), 
+                                                f'{round(self.e.magnitude,2)}', ha='left', va='center',rotation=90)        
+                
+        for i in range(int(self.n_ps/2 - 1)):
+                
+            self.ax.annotate('', 
+                    xy=(chapa_ponto_init[0] + self.Conectante.lc.magnitude+10, 
+                        chapa_ponto_init[1] + self.e.magnitude + self.s.magnitude*i), 
+                    
+                    xytext=(chapa_ponto_init[0] + self.Conectante.lc.magnitude + 10,
+                            chapa_ponto_init[1] + self.e.magnitude + self.s.magnitude*(i+1)), 
+                    arrowprops={'arrowstyle': '<->'})
+        
+            self.ax.text(chapa_ponto_init[0] + self.Conectante.lc.magnitude + 12, 
+                        (chapa_ponto_init[1] + self.e.magnitude + (((i)*2 + 1)*self.s.magnitude)/2), 
+                                                f'{round(self.s.magnitude,2)}', ha='left', va='center',rotation=90)
+        
+        #--------------------------------NOMENCLATURA DA CHAPA-------------------------------------------------
+        
+              
+        self.ax.annotate('', 
+                    xy=(chapa_ponto_init[0] + self.Conectante.lc.magnitude/2, 
+                        chapa_ponto_init[1] + 10), 
+                    
+                    xytext=(chapa_ponto_init[0] + self.Conectante.lc.magnitude/2 + 25,
+                            chapa_ponto_init[1] + 10 - self.TAMANHO/3 + 50), 
+                    arrowprops={'arrowstyle': '->'})
+        
+        self.ax.text(chapa_ponto_init[0] + self.Conectante.lc.magnitude/2 + 25, 
+                        (chapa_ponto_init[1] + 10 - self.TAMANHO/3 + 50), 
+                                                f'{self.Conectante.name}', ha='left', va='center')       
         
         
-
         #self.ax.set_aspect('equal')
         plt.axis('off')
         if show:
