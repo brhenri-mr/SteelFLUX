@@ -80,7 +80,21 @@ class BasicConnection:
         self.Coluna = Coluna
         self.Viga = Viga
         self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
-        self.e = (Viga.h - (n_ps/2 -1)*self.s)/2 # Distancia entre centro do furo e borda
+        
+        # Tentando verificar a distância da borda com uma valor de tamanho de Conectante
+        try:
+            self.lc = Conectante.lc
+            self.e = (Conectante.lc - (n_ps/2 -1)*self.s)/2 # Distancia entre centro do furo e borda vertical
+
+    
+        except:
+            self.lc = 0
+            self.e = (Viga.h - (n_ps/2 -1)*self.s)/2 # Distancia entre centro do furo e borda vertical
+            
+        assert self.e.magnitude>0, 'Distância entre furos (s) está superando o comprimento da chapa'
+        
+        assert s>= 3*Conector.d_b.magnitude, 'Distância entre furos insuficiente' # Distância mínima entre furos Iterm 6.3.9
+            
         self.Result_unit = Result_unit
         self.coef = coef
         self.Conectante = Conectante
@@ -97,34 +111,34 @@ class BasicConnection:
         # -------------------------------Coluna Definição das Breakline-------------------------------
         for altura in [1, self.TAMANHO]:
                 coord = list(zip(*breakline(-1, altura, 
-                                            length=self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude)))
+                                            length=self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + self.lc.magnitude)))
                 self.ax.plot(coord[0],coord[1], color='black', linewidth=0.8)
         
         # -------------------------------Coluna Definição das mesas-------------------------------
-        for offset in [0, self.Coluna.h.magnitude + self.Coluna.tf.magnitude]:
+        for offset in [0, self.Coluna.h.magnitude + self.Coluna.tf.magnitude + self.lc.magnitude]:
                 
-                mesa2 = patches.Rectangle((1 + offset,1), 
+                mesa2 = patches.Rectangle((1 + offset ,1), 
                                  self.Coluna.tf.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
                 self.ax.add_patch(mesa2)
 
         coluna = patches.Rectangle((1 + self.Coluna.tf.magnitude,1), 
-                                 self.Coluna.h.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
+                                 self.Coluna.h.magnitude+ self.lc.magnitude, self.TAMANHO-1, edgecolor='black', facecolor='gray')
         self.ax.add_patch(coluna)
         
         # ---------------------------------VIGA-----------------------------------------------------
-        mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
-                                  self.TAMANHO/2 + self.Viga.h.magnitude/2), 
-                                 100, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
+        mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude + self.lc.magnitude, 
+                                  self.TAMANHO/2 + self.Viga.h.magnitude/2 ), 
+                                 100+self.lc.magnitude, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
         self.ax.add_patch(mesa1)
         
-        mesa2 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
+        mesa2 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude + self.lc.magnitude, 
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude*1.6 ), 
-                                 100, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
+                                 100+self.lc.magnitude, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
         self.ax.add_patch(mesa2)
         
-        alma = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
+        alma = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude + self.lc.magnitude, 
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2), 
-                                 100, self.Viga.h.magnitude, edgecolor='black', facecolor='gray')
+                                 100+self.lc.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='gray')
         self.ax.add_patch(alma)
 
     
@@ -251,13 +265,14 @@ class BeamChecker:
                  n_ps:float,
                  Viga,
                  s:float,
+                 e:float,
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton',
                  coef1=1.1
                  ):
 
         self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
-        self.e = (Viga.h - (n_ps/2 -1)*self.s)/2 # Distancia entre centro do furo e borda
+        self.e = e
         self.Result_unit = Result_unit
         self.coef1 = coef1
         self.Viga = Viga
@@ -416,7 +431,13 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  Coluna=Coluna,)
         
         
-        BeamChecker.__init__(self, n_ps, Viga, s, Dimension_unit, Result_unit, coef1)
+        BeamChecker.__init__(self, n_ps=n_ps, 
+                             Viga=Viga, 
+                             s=s,
+                             e=self.e,
+                             Dimension_unit= Dimension_unit, 
+                             Result_unit=Result_unit, 
+                             coef1=coef1)
 
          
         # Classes
@@ -426,11 +447,6 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         self.Coluna = Coluna
         
         # Dados
-        
-        assert self.e.magnitude>0, 'Distância entre furos (s) está superando o comprimento da chapa'
-        
-        assert s>= 3*Conector.d_b.magnitude, 'Distância entre furos insuficiente' # Distância mínima entre furos Iterm 6.3.9
-        
         self.g_ch = g_ch*unit[Dimension_unit] # Distancia entre linhas de parafusos
         
         # Dimensoes
@@ -887,31 +903,66 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         BeamChecker.__init__(self, n_ps=n_ps, 
                              Viga=Viga, 
                              s=s,
+                             e=self.e,
                              Dimension_unit= Dimension_unit, 
                              Result_unit=Result_unit, 
                              coef1=coef1)
         
-        
+        self.scale_corretion = Angle.lc.magnitude
         assert Angle.lc.magnitude < Viga.h.magnitude, 'Cantoneira maior que alma da viga'
     
     def plotView(self, show=True):
         unit.setup_matplotlib()
+        parafuso_interno = int((self.n_ps/2 - 1))
         
         #----------------------------------Vista Frontal da aba------------------------------------------
-        chapa_ponto_init = (self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1, self.TAMANHO/2 -self.Conectante.lc.magnitude/2)
+        chapa_ponto_init = (self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.scale_corretion, 
+                            self.TAMANHO/2 - self.Conectante.lc.magnitude/2)
 
         aba_frontal = patches.Rectangle(chapa_ponto_init,
                                  self.Conectante.t_ch.magnitude, self.Conectante.lc.magnitude, edgecolor='black', facecolor='#D3D3D3')
         self.ax.add_patch(aba_frontal)
         
-        #---------------------------------Vista lateral da aba-------------------
+        #---------------------------------Vista lateral da aba------------------------------------------
         # Por causa da escala, pode parecer que os valores de x são superior aos de y
         aba_lateral = patches.Rectangle((chapa_ponto_init[0] + self.Conectante.t_ch.magnitude, chapa_ponto_init[1]),
                                           self.Conectante.lc.magnitude - self.Conectante.t_ch.magnitude, self.Conectante.lc.magnitude,
                                          edgecolor='black', facecolor='#D3D3D3')
         
         self.ax.add_patch(aba_lateral)
-        self.ax.set_aspect('equal')
+        #--------------------------------------Furo-----------------------------------------------
+
+        furo = patches.Circle((chapa_ponto_init[0] + self.Conectante.lc.magnitude - self.e.magnitude ,
+                               chapa_ponto_init[1] + self.e.magnitude), 
+                              radius=self.Parafuso.d_b.magnitude/2, 
+                              edgecolor='black', 
+                              facecolor='white')
+        
+        self.ax.add_patch(furo)
+        
+        furo = patches.Circle((chapa_ponto_init[0] + self.Conectante.lc.magnitude - self.e.magnitude,
+                               chapa_ponto_init[1] +  self.Conectante.lc.magnitude - self.e.magnitude), 
+                              radius=self.Parafuso.d_b.magnitude/2, 
+                              edgecolor='black', 
+                              facecolor='white')
+        
+        self.ax.add_patch(furo)
+        
+        print(self.Parafuso.d_b.magnitude/2)
+        
+        for i in range(parafuso_interno-1):
+                
+                furo_interno = patches.Circle((
+                                chapa_ponto_init[0] + self.Conectante.lc.magnitude - self.e.magnitude, 
+                                chapa_ponto_init[1] + self.e.magnitude + self.s.magnitude*(i+1)), 
+                                radius=self.Parafuso.d_b.magnitude/2,
+                                edgecolor='black', facecolor='white')
+                
+                self.ax.add_patch(furo_interno) 
+        
+        
+
+        #self.ax.set_aspect('equal')
         plt.axis('off')
         if show:
                 plt.show() # if you need...

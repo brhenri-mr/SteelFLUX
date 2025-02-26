@@ -35,7 +35,7 @@ chapa = Plate(name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
 cantoneira = CornerFrame(t_ch=3.18,
                              f_yc=345,
                              f_uc=400,
-                             lc=50.8)
+                             lc=120.8)
 
 
 
@@ -43,8 +43,8 @@ lcpp = LCPP(
         Viga=viga,
         Coluna=coluna,
         Angle=cantoneira,
-        n_ps=4,
-        s=60,
+        n_ps=6,
+        s=48,
         Conector=parafuso
     )
     
