@@ -911,6 +911,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         self.scale_corretion = Angle.lc.magnitude
         assert Angle.lc.magnitude < Viga.h.magnitude, 'Cantoneira maior que alma da viga'
     
+    
     def plotView(self, show=True):
         unit.setup_matplotlib()
         parafuso_interno = int((self.n_ps/2 - 1))
@@ -1026,6 +1027,85 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         return self.ax
 
     
+    def platePlot(self, ax=0, show=True):
+        unit.setup_matplotlib()
+        
+        # Tamanho da imagem - dos eixos 
+        width = (self.Conectante.lc.magnitude + self.Viga.tw.magnitude)*1.45
+        height = (self.Conectante.lc.magnitude + self.Viga.tw.magnitude)*1.45
+        
+        if ax == 0:
+                fig, ax = plt.subplots(figsize=(8, 6))
+        
+        # Defindo os limites dos eixos
+        #ax.set_xlim(0, width)  
+        #ax.set_ylim(0, height)  
+        
+        for e, anchor_conectante in enumerate([(width/2 - self.Viga.tw.magnitude/2 - self.Conectante.lc.magnitude ),(width/2 + self.Viga.tw.magnitude/2)]):
+                
+                rect = patches.Rectangle((anchor_conectante, height/2 - self.Conectante.lc.magnitude/2), 
+                                        self.Conectante.lc.magnitude, self.Conectante.lc.magnitude, edgecolor='black', facecolor='#D3D3D3')
+                ax.add_patch(rect)  
+                
+                if e == 0:
+                        anchor = anchor_conectante + self.Conectante.lc.magnitude - self.Conectante.t_ch.magnitude
+                else:
+                        anchor = anchor_conectante
+                
+                aba = patches.Rectangle((anchor, height/2 - self.Conectante.lc.magnitude/2), 
+                                        self.Conectante.t_ch.magnitude, self.Conectante.lc.magnitude, edgecolor='black', facecolor='#a9a9a9')
+               
+                ax.add_patch(aba)  
+        
+        for i in range(int(self.n_ps*0.5)):
+                # Definindo as coordenadas do centro de cada furo
+                x_d = width/2 + self.Viga.tw.magnitude/2 + self.Conectante.lc.magnitude - self.e.magnitude
+                
+                x_e = width/2 - self.Viga.tw.magnitude/2 - self.Conectante.lc.magnitude + self.e.magnitude
+                
+                y = height/2 - self.Conectante.lc.magnitude/2  + self.e.magnitude + self.s.magnitude*i
+
+                # Linha de centro e furo
+                for x_i in [x_d, x_e]:
+                        circle = plt.Circle((x_i, y), 
+                                    self.d_h.magnitude/2, 
+                                    edgecolor='black', 
+                                    facecolor='white')
+                
+                        ax.add_patch(circle)
+                        
+                        # linha horizontal de centro
+                        ax.plot([(x_i + self.d_h.magnitude/2) + self.d_h.magnitude/2*0.5 , 
+                        (x_i - self.d_h.magnitude/2) - self.d_h.magnitude/2*0.5], 
+                                [y, y], 
+                                color='red', linestyle='-.', linewidth=1)
+                        
+                        # linha Vertical de centro
+                        ax.plot([x_i , x_i], 
+                        [(y + self.d_h.magnitude/2) + self.d_h.magnitude/2*0.5 , 
+                        (y - self.d_h.magnitude/2) - self.d_h.magnitude/2*0.5  ], 
+                                color='red', linestyle='-.', linewidth=1)
+       
+       
+        # Definição das cotas intermediárias
+        for i in range(int(self.n_ps/2 - 1)):
+                
+                ax.annotate('', 
+                    xy=(width/2 + self.Viga.tw.magnitude/2 + self.Conectante.lc.magnitude*1.05, 
+                        height/2 - self.Conectante.lc.magnitude/2 + self.e.magnitude + self.s.magnitude*i), 
+                    
+                    xytext=(width/2 + self.Viga.tw.magnitude/2 + self.Conectante.lc.magnitude*1.05,
+                            height/2 - self.Conectante.lc.magnitude/2 + self.e.magnitude + self.s.magnitude*(i+1)), 
+                    arrowprops={'arrowstyle': '<->'})
+        
+                ax.text(width/2 + self.Viga.tw.magnitude/2 + self.Conectante.lc.magnitude*1.06, 
+                        (height/2 - self.Conectante.lc.magnitude/2 + self.e.magnitude + (((i)*2 + 1)*self.s.magnitude)/2), 
+                                                f'{round(self.s.magnitude,2)}', ha='left', va='center',rotation=90)
+        ax.set_aspect('equal')
+        plt.axis('off')
+        if show:
+                plt.show()
+        return ax
     
     
     def AngleCrush(self):
