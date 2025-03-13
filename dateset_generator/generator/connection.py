@@ -69,13 +69,19 @@ class BasicConnection:
                  Conector,
                  Coluna,
                  Viga,
+                 uuid:UUID,
                  s:float, 
                  Conectante,
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton',
+                 dev_mode=True,
                  coef=1.35,
                  ):
-            
+       
+       
+        self.uuid = uuid
+        self.dev_mode = dev_mode
+        self.settings = Settings()
         self.d_h = Conector.d_b + 1.5*unit['millimeter'] # Diametro de furo
         self.Coluna = Coluna
         self.Viga = Viga
@@ -104,7 +110,7 @@ class BasicConnection:
         # Inicializando o desenho padrão
         self.plotBasic()
     
-    def plotBasic(self):
+    def plotBasic(self, SHOW=False):
         unit.setup_matplotlib()
         self.ax.set_ylim(0, self.TAMANHO*1.17)  
         
@@ -140,7 +146,14 @@ class BasicConnection:
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2), 
                                  100+self.lc.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='gray')
         self.ax.add_patch(alma)
+        plt.axis('off')
 
+        if SHOW:
+            plt.show()
+        
+        if not self.dev_mode:
+            plt.savefig(os.path.join(self.settings.DATASET_URL,'raw',f'{self.uuid}.png'))
+        
     
     def plateShear(self):
         ''' 
@@ -428,6 +441,8 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  Result_unit=Result_unit,
                                  coef=coef,
                                  Conectante=Plate,
+                                 uuid=uuid,
+                                 dev_mode=dev_mode,
                                  Coluna=Coluna,)
         
         
@@ -880,8 +895,10 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                  Coluna,
                  n_ps:float,
                  s:float, 
+                 uuid:UUID,
                  coef=1.35, 
                  coef1=1.1,
+                 dev_mode=True,
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton'):
          
@@ -896,6 +913,8 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                                  Dimension_unit=Dimension_unit, 
                                  Result_unit=Result_unit,
                                  coef=coef,
+                                 dev_mode=dev_mode,
+                                 uuid=uuid,
                                  Conectante=Angle,
                                  Coluna=Coluna,)
         
@@ -912,7 +931,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         assert Angle.lc.magnitude < Viga.h.magnitude, 'Cantoneira maior que alma da viga'
     
     
-    def plotView(self, show=True):
+    def plotView(self, show=False):
         unit.setup_matplotlib()
         parafuso_interno = int((self.n_ps/2 - 1))
         
@@ -1027,7 +1046,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         return self.ax
 
     
-    def platePlot(self, ax=0, show=True):
+    def platePlot(self, ax=0, show=False):
         unit.setup_matplotlib()
         
         # Tamanho da imagem - dos eixos 

@@ -44,8 +44,10 @@ lcpp = LCPP(
         Coluna=coluna,
         Angle=cantoneira,
         n_ps=6,
+        uuid=uuid4(),
         s=48,
-        Conector=parafuso
+        Conector=parafuso,
+        dev_mode=False
     )
     
 
