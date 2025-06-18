@@ -19,20 +19,22 @@ viga = Beam(name='W150x13',
             tw=4.3,
             tf=4.3,
             h=138,
+            bf=80,
             fy=345,
             fu=400)
 
 coluna = Column(
       name='w',
       h=80,
-      tf=4.3
+      tf=4.3,
+      bf=200,
 )
 
 parafuso = Conector(d_b=16,  f_ub=825)
 
 chapa = Plate(name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
 
-cantoneira = CornerFrame(t_ch=3.18,
+'''cantoneira = CornerFrame(t_ch=3.18,
                              f_yc=345,
                              f_uc=400,
                              lc=120.8)
@@ -51,12 +53,16 @@ lcpp = LCPP(
     )
     
 
-lcpp.platePlot()
+lcpp.platePlot()'''
 
-#conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=False, uuid=uuid4())
+conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=True, uuid=uuid4())
+conexao.plotBasicFrontal(SHOW=False)
+conexao.platePlot(conexao.ax_frontal)
 #conexao.plotConnection(show=False)
 #conexao.mask()
-'''
+
+
+"""
 for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5/8"', 'CH 3/4"', 'CH 7/8"' ]:
       for nome, materia_chapa in material.items():
             for element in bitolas:
@@ -69,7 +75,6 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                                                 c= 200,
                                                 f_uc=materia_chapa['fu'],
                                                 f_yc=materia_chapa['fy'])
-                              
                               
                               
                               print(f'Teste com {element} para {i*2} parafusos com chapa {chapa_tipo} {nome}')
@@ -120,4 +125,4 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                               print(f'Falha em {element} para o conjunto com {i*2} parafusos')
                               print(f'{e}')
                               break
-'''
+"""

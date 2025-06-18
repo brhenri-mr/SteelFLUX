@@ -94,7 +94,7 @@ class BasicConnection:
 
     
         except:
-            self.lc = 0
+            self.lc = 0*unit[Dimension_unit]
             self.e = (Viga.h - (n_ps/2 -1)*self.s)/2 # Distancia entre centro do furo e borda vertical
             
         assert self.e.magnitude>0, 'Distância entre furos (s) está superando o comprimento da chapa'
@@ -105,6 +105,7 @@ class BasicConnection:
         self.coef = coef
         self.Conectante = Conectante
         self.fig, self.ax = plt.subplots(figsize=(8, 6))
+        self.fig_frontal, self.ax_frontal = plt.subplots(figsize=(8, 6))
         self.TAMANHO = Settings().TAMANHO_IMG
         
         # Inicializando o desenho padrão
@@ -154,6 +155,58 @@ class BasicConnection:
         if not self.dev_mode:
             plt.savefig(os.path.join(self.settings.DATASET_URL,'raw',f'{self.uuid}.png'))
         
+        
+    def plotBasicFrontal(self, SHOW=False):
+        unit.setup_matplotlib()
+
+        # Tamanho da imagem - dos eixos 
+        width = self.Chapa.c.magnitude*1.2
+        height = self.Viga.h.magnitude*1.2
+        
+        # Defindo os limites dos eixos
+        self.ax_frontal.set_xlim(0, width)  
+        self.ax_frontal.set_ylim(0, height)  
+        
+        tamanho_retangulo = self.Coluna.bf.magnitude
+        
+        centro_x = (self.Chapa.c.magnitude*0.1 + self.Chapa.c.magnitude)/2
+        centro_y = (self.Viga.h.magnitude*0.1 + self.Viga.h.magnitude)/2
+        
+        off_set = self.Chapa.c.magnitude*0.05 # preciso desse valor para que as coisas se encaixem
+        
+        off_set_y = self.Viga.h.magnitude*0.05
+
+        
+        # -------------------------------Coluna Definição das mesas-------------------------------
+
+        coluna = patches.Rectangle((centro_x - self.Coluna.bf.magnitude/2 + off_set , -self.TAMANHO/2), 
+                                 tamanho_retangulo, self.TAMANHO*2, edgecolor='black', facecolor='gray')
+        self.ax_frontal.add_patch(coluna)
+        
+        # ---------------------------------VIGA-----------------------------------------------------
+        mesa1 = patches.Rectangle((centro_x - self.Viga.bf.magnitude/2 + off_set, 
+                                  centro_y + self.Viga.h.magnitude/2 + off_set_y), 
+                                 self.Viga.bf.magnitude - 2, self.Viga.tf.magnitude, edgecolor='black', facecolor='gray', hatch='//')
+        self.ax_frontal.add_patch(mesa1)
+        
+        mesa2 = patches.Rectangle((centro_x - self.Viga.bf.magnitude/2 + off_set, 
+                                  centro_y - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude + off_set_y), 
+                                 self.Viga.bf.magnitude - 2, self.Viga.tf.magnitude, edgecolor='black', facecolor='gray', hatch='//')
+        self.ax_frontal.add_patch(mesa2)
+        
+        alma = patches.Rectangle((centro_x - self.Viga.tw.magnitude/2 + off_set, 
+                                  centro_y - self.Viga.h.magnitude/2 + off_set_y), 
+                                 self.Viga.tw.magnitude, self.Viga.h.magnitude,edgecolor='lightgray', facecolor='gray', hatch='//')
+
+        self.ax_frontal.add_patch(alma)
+        plt.axis('off')
+
+        if SHOW:
+            plt.show()
+        
+        if not self.dev_mode:
+            plt.savefig(os.path.join(self.settings.DATASET_URL,'frontal_bases',f'{self.uuid}.png'))
+    
     
     def plateShear(self):
         ''' 
@@ -501,8 +554,8 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                 fig, ax = plt.subplots(figsize=(8, 6))
         
         # Defindo os limites dos eixos
-        ax.set_xlim(0, width)  
-        ax.set_ylim(0, height)  
+        ax.set_xlim(-width*0.5, width*1.5)  
+        ax.set_ylim(-height*0.5, height*1.5)  
         
         # PLotagem da chapa
         rect = patches.Rectangle(local_plate, 
@@ -514,35 +567,21 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         ax.add_patch(hatch_rect)
 
         #--------------- Adicionar cota horizontal-----------------------------
-        if show:
-                ax.annotate('', 
-                        xy=(self.Chapa.c.magnitude*0.1, self.Viga.h.magnitude*0.03), 
-                        xytext=(self.Chapa.c.magnitude*1.1, self.Viga.h.magnitude*0.03), 
-                        arrowprops={'arrowstyle': '<->'})
-                
-                ax.text(width*0.5, self.Viga.h.magnitude*0.01, f'L = {self.Chapa.c.magnitude}', ha='center', va='center') 
-                
-                ax.annotate('', 
-                        xy=(width/2 - self.g_ch.magnitude/2, self.Viga.h.magnitude*0.08), 
-                        xytext=(width/2 + self.g_ch.magnitude/2, self.Viga.h.magnitude*0.08), 
-                        arrowprops={'arrowstyle': '<->'})
-                
-                ax.text(width*0.5, self.Viga.h.magnitude*0.06, f'g_ch = {self.g_ch.magnitude}', ha='center', va='center') 
-        else:
-                ax.annotate('', 
-                        xy=(self.Chapa.c.magnitude*0.1, self.Viga.h.magnitude*1.20), 
-                        xytext=(self.Chapa.c.magnitude*1.1, self.Viga.h.magnitude*1.20), 
-                        arrowprops={'arrowstyle': '<->'})
-                
-                ax.text(width*0.5, self.Viga.h.magnitude*1.25, f'L = {round(self.Chapa.c.magnitude, 2)}', ha='center', va='center',fontsize=8) 
-                
-                ax.annotate('', 
-                        xy=(width/2 - self.g_ch.magnitude/2, self.Viga.h.magnitude*1.12), 
-                        xytext=(width/2 + self.g_ch.magnitude/2, self.Viga.h.magnitude*1.12), 
-                        arrowprops={'arrowstyle': '<->'})
-                
-                ax.text(width*0.5, self.Viga.h.magnitude*1.15, f'{round(self.g_ch.magnitude, 2)}', ha='center', va='center',fontsize=8) 
+
+        ax.annotate('', 
+                xy=(self.Chapa.c.magnitude*0.1, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.20), 
+                xytext=(self.Chapa.c.magnitude*1.1, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.20), 
+                arrowprops={'arrowstyle': '<->'})
         
+        ax.text(width*0.5, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.25, f'L = {round(self.Chapa.c.magnitude, 2)}', ha='center', va='center',fontsize=8) 
+        
+        ax.annotate('', 
+                xy=(width/2 - self.g_ch.magnitude/2, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.12), 
+                xytext=(width/2 + self.g_ch.magnitude/2, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.12), 
+                arrowprops={'arrowstyle': '<->'})
+        
+        ax.text(width*0.5, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.15, f'{round(self.g_ch.magnitude, 2)}', ha='center', va='center',fontsize=8) 
+
         
         #--------------------------------------- Adicionar cota Vertical-------------------------------------
         ax.annotate('', 
@@ -587,16 +626,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                 
         
         #---------------------------------------------------------------------------------------------------
-        if show:
-        # Adicionando corta vertical
-                ax.annotate('', 
-                    xy=(width*0.5, self.Viga.h.magnitude*1.1), 
-                    xytext=(width*0.55,self.Viga.h.magnitude*1.15), 
-                    arrowprops={'arrowstyle': '->'})
-        
-                ax.text(width*0.55, self.Viga.h.magnitude*1.15, f'{self.Viga.name}', ha='left', va='center',)
-        
-        
+        parafuso_annotate = True
         for i in range(int(self.n_ps*0.5)):
                 # Definindo as coordenadas do centro de cada furo
                 x_d = width/2 + self.g_ch.magnitude/2
@@ -625,11 +655,19 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                         [(y + self.d_h.magnitude/2) + self.d_h.magnitude/2*0.5 , 
                         (y - self.d_h.magnitude/2) - self.d_h.magnitude/2*0.5  ], 
                                 color='red', linestyle='-.', linewidth=1)
-                
 
+                        if parafuso_annotate:
+                                parafuso_annotate = False
+                                ax.annotate('', 
+                                        xy=(x_e, y), 
+                                        xytext=(x_e, y - self.e.magnitude - self.Viga.tf.magnitude - 12), 
+                                        arrowprops={'arrowstyle': '->'})
+
+                                ax.text(x_e , (y - self.e.magnitude - self.Viga.tf.magnitude) - 12, f'{self.Parafuso.name}', ha='left', va='center',)
         # Deligando a moldura
 
         plt.axis('off')
+
         if show:
                 plt.show()
         return ax

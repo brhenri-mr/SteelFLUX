@@ -9,6 +9,7 @@ class Beam:
                  tf:float,
                  fy:float,
                  fu:float,
+                 bf:float,
                  Resistence_unit='megapascal',
                  Dimension_unit='millimeter') -> None:
         '''
@@ -25,6 +26,8 @@ class Beam:
                 Resistência a escoamento da chapa
         * fu: float
                 Resistência a ruptura da chapa
+        * bf: float
+                Comprimento do flange
         '''
         self.name = name
         self.h = h*unit[Dimension_unit]
@@ -32,6 +35,7 @@ class Beam:
         self.tf = tf*unit[Dimension_unit]
         self.fy = fy*unit[Resistence_unit]
         self.fu = fu*unit[Resistence_unit]
+        self.bf = bf*unit[Dimension_unit]
 
 
 class Plate:
@@ -93,13 +97,14 @@ class Conector:
         '''
         self.d_b = d_b*unit[Dimension_unit]
         self.f_ub = f_ub*unit[Resistence_unit]
-
+        self.name = f'ASTM {f_ub} d={d_b}'
 
 class Column:
     def __init__(self, 
                  name:str,
                  tf:float,
                  h:float,
+                 bf:float,
                  Dimension_unit='millimeter'):
         '''
         Parameters
@@ -109,11 +114,14 @@ class Column:
                 Espessura do flange
         * h: float
                 Altura da alma do perfil
+        * bf: float
+                Comprimento do flange
 
         '''
         self.name = name   
         self.h = h*unit[Dimension_unit]
         self.tf = tf*unit[Dimension_unit]
+        self.bf = bf*unit[Dimension_unit]
 
 
 class CornerFrame:
