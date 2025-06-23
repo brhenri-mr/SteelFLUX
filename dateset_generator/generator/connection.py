@@ -179,7 +179,7 @@ class BasicConnection:
         unit.setup_matplotlib()
 
         # Tamanho da imagem - dos eixos 
-        width = self.Chapa.c.magnitude*1.2
+        width = self.Conectante.c.magnitude*1.2
         height = self.Viga.h.magnitude*1.2
         
         # Defindo os limites dos eixos
@@ -188,10 +188,10 @@ class BasicConnection:
         
         tamanho_retangulo = self.Coluna.bf.magnitude
         
-        centro_x = (self.Chapa.c.magnitude*0.1 + self.Chapa.c.magnitude)/2
+        centro_x = (self.Conectante.c.magnitude*0.1 + self.Conectante.c.magnitude)/2
         centro_y = (self.Viga.h.magnitude*0.1 + self.Viga.h.magnitude)/2
         
-        off_set = self.Chapa.c.magnitude*0.05 # preciso desse valor para que as coisas se encaixem
+        off_set = self.Conectante.c.magnitude*0.05 # preciso desse valor para que as coisas se encaixem
         
         off_set_y = self.Viga.h.magnitude*0.05
 
@@ -247,8 +247,6 @@ class BasicConnection:
                 (1 + self.Coluna.tf.magnitude , 1),
                 (1, 1)
                 ]
-        
-        print(points)
         
         coluna = patches.Polygon(points, closed=True, fill=True, edgecolor='black', hatch='//', facecolor='gray')
         self.ax_top.add_patch(coluna)

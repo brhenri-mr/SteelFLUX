@@ -57,8 +57,7 @@ lcpp = LCPP(
 lcpp.platePlot()'''
 
 conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=True, uuid=uuid4())
-conexao.plotBasicTop(SHOW=False)
-conexao.plotTop(show=True)
+
 #conexao.plotConnection(show=False)
 #conexao.mask()
 
