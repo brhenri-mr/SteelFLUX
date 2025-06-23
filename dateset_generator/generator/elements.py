@@ -103,6 +103,7 @@ class Column:
     def __init__(self, 
                  name:str,
                  tf:float,
+                 tw:float,
                  h:float,
                  bf:float,
                  Dimension_unit='millimeter'):
@@ -116,11 +117,14 @@ class Column:
                 Altura da alma do perfil
         * bf: float
                 Comprimento do flange
+        * tw:float
+                Espessura da alma do perfil
 
         '''
         self.name = name   
         self.h = h*unit[Dimension_unit]
         self.tf = tf*unit[Dimension_unit]
+        self.tw = tw*unit[Dimension_unit]
         self.bf = bf*unit[Dimension_unit]
 
 

@@ -27,6 +27,7 @@ coluna = Column(
       name='w',
       h=80,
       tf=4.3,
+      tw=4.3,
       bf=200,
 )
 
@@ -56,8 +57,8 @@ lcpp = LCPP(
 lcpp.platePlot()'''
 
 conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=True, uuid=uuid4())
-conexao.plotBasicFrontal(SHOW=False)
-conexao.platePlot(conexao.ax_frontal)
+conexao.plotBasicTop(SHOW=False)
+conexao.plotTop(show=True)
 #conexao.plotConnection(show=False)
 #conexao.mask()
 

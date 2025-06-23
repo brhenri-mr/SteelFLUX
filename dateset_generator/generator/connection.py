@@ -106,10 +106,29 @@ class BasicConnection:
         self.Conectante = Conectante
         self.fig, self.ax = plt.subplots(figsize=(8, 6))
         self.fig_frontal, self.ax_frontal = plt.subplots(figsize=(8, 6))
+        self.fig_top, self.ax_top = plt.subplots(figsize=(8, 6))
         self.TAMANHO = Settings().TAMANHO_IMG
+        
+        # Inicializando as pastas do dataset
+        self.initialize()
         
         # Inicializando o desenho padrão
         self.plotBasic()
+        self.plotBasicFrontal()
+        self.plotBasicTop()
+        
+    
+    def initialize(self):
+        '''
+        Método para criar as pastas do dataset
+        '''
+        # Verificando se já não existe as pastas
+        if not os.path.isdir(self.settings.DATASET_URL):
+            for pasta in ['img', 'base', 'mask']:
+                for subpasta in ['frontal', 'lateral', 'top']:
+                    os.makedirs(os.path.join(self.settings.DATASET_URL, pasta, subpasta), exist_ok=True)
+            
+        
     
     def plotBasic(self, SHOW=False):
         unit.setup_matplotlib()
@@ -153,7 +172,7 @@ class BasicConnection:
             plt.show()
         
         if not self.dev_mode:
-            plt.savefig(os.path.join(self.settings.DATASET_URL,'raw',f'{self.uuid}.png'))
+            plt.savefig(os.path.join(self.settings.DATASET_URL,'base','lateral',f'{self.uuid}.png'))
         
         
     def plotBasicFrontal(self, SHOW=False):
@@ -196,7 +215,7 @@ class BasicConnection:
         
         alma = patches.Rectangle((centro_x - self.Viga.tw.magnitude/2 + off_set, 
                                   centro_y - self.Viga.h.magnitude/2 + off_set_y), 
-                                 self.Viga.tw.magnitude, self.Viga.h.magnitude,edgecolor='lightgray', facecolor='gray', hatch='//')
+                                 self.Viga.tw.magnitude, self.Viga.h.magnitude,edgecolor='black', facecolor='gray', hatch='//')
 
         self.ax_frontal.add_patch(alma)
         plt.axis('off')
@@ -205,8 +224,62 @@ class BasicConnection:
             plt.show()
         
         if not self.dev_mode:
-            plt.savefig(os.path.join(self.settings.DATASET_URL,'frontal_bases',f'{self.uuid}.png'))
+            plt.savefig(os.path.join(self.settings.DATASET_URL,'base','front',f'{self.uuid}.png'))
     
+    
+    def plotBasicTop(self, SHOW=False):
+            
+        self.ax_top.set_ylim(0, self.TAMANHO*1.17)  
+        self.ax_top.set_xlim(0, self.TAMANHO*1.17)  
+        offset = self.Conectante.t_ch.magnitude
+        
+        points = [
+                (1, 1), (1, 1 + self.Coluna.bf.magnitude),
+                (1 + self.Coluna.tf.magnitude, 1 + self.Coluna.bf.magnitude),
+                (1 + self.Coluna.tf.magnitude, 1 + self.Coluna.bf.magnitude/2 + self.Coluna.tw.magnitude/2),
+                (1 + self.Coluna.tf.magnitude + self.Coluna.h.magnitude, 1 + self.Coluna.bf.magnitude/2 + self.Coluna.tw.magnitude/2),
+                (1 + self.Coluna.tf.magnitude + self.Coluna.h.magnitude, 1 + self.Coluna.bf.magnitude),
+                (1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude, 1 + self.Coluna.bf.magnitude),
+                (1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude, 1),
+                (1 + self.Coluna.tf.magnitude + self.Coluna.h.magnitude, 1),
+                (1 + self.Coluna.tf.magnitude + self.Coluna.h.magnitude, 1 + self.Coluna.bf.magnitude/2 - self.Coluna.tw.magnitude/2),
+                (1 + self.Coluna.tf.magnitude , 1 + self.Coluna.bf.magnitude/2 - self.Coluna.tw.magnitude/2),
+                (1 + self.Coluna.tf.magnitude , 1),
+                (1, 1)
+                ]
+        
+        print(points)
+        
+        coluna = patches.Polygon(points, closed=True, fill=True, edgecolor='black', hatch='//', facecolor='gray')
+        self.ax_top.add_patch(coluna)
+        
+        #-------------------------------------------------Viga----------------------------------------------------
+        
+        mesa = patches.Rectangle((offset + 1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude, 1 + self.Coluna.bf.magnitude/2 - self.Viga.bf.magnitude/2),
+                                 200, self.Viga.bf.magnitude,edgecolor='black', facecolor='gray')
+        self.ax_top.add_patch(mesa)
+        
+        self.ax_top.plot([offset + 1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude, 
+                          offset + 1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude + 200],
+                          [1 + self.Coluna.bf.magnitude/2 - self.Viga.tf.magnitude/2, 
+                           1 + self.Coluna.bf.magnitude/2 - self.Viga.tf.magnitude/2], linestyle='--', color='black') # alma 1
+        
+        self.ax_top.plot([offset + 1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude, 
+                          offset + 1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude + 200],
+                          [1 + self.Coluna.bf.magnitude/2 + self.Viga.tf.magnitude/2, 
+                           1 + self.Coluna.bf.magnitude/2 + self.Viga.tf.magnitude/2], linestyle='--', color='black') # alma 1
+        
+        
+        #---------------------------------------------------------------------------------------------------------
+        
+        plt.axis('off')
+
+        if SHOW:
+            plt.show()
+        
+        if not self.dev_mode:
+            plt.savefig(os.path.join(self.settings.DATASET_URL,'base','top',f'{self.uuid}.png'))
+        
     
     def plateShear(self):
         ''' 
@@ -538,7 +611,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         self.dev_mode = dev_mode
 
 
-    def platePlot(self, ax=0, show=True): 
+    def platePlot(self, show=True): 
         # Criar uma figura e eixos
         unit.setup_matplotlib()
         
@@ -550,69 +623,68 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         local_plate = (self.Chapa.c.magnitude*0.1, self.Viga.h.magnitude*0.1) # Chapa
         local_web = ((width - self.Viga.tw.magnitude)*0.5, self.Viga.h.magnitude*0.1) # Alma da viga
         
-        if ax == 0:
-                fig, ax = plt.subplots(figsize=(8, 6))
+
         
         # Defindo os limites dos eixos
-        ax.set_xlim(-width*0.5, width*1.5)  
-        ax.set_ylim(-height*0.5, height*1.5)  
+        self.ax.set_xlim(-width*0.5, width*1.5)  
+        self.ax.set_ylim(-height*0.5, height*1.5)  
         
         # PLotagem da chapa
         rect = patches.Rectangle(local_plate, 
                                  self.Chapa.c.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='#D3D3D3')
-        ax.add_patch(rect)  
+        self.ax.add_patch(rect)  
         
         # Plotagem da alma
         hatch_rect = patches.Rectangle(local_web, self.Viga.tw.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='gray', hatch='//')
-        ax.add_patch(hatch_rect)
+        self.ax.add_patch(hatch_rect)
 
         #--------------- Adicionar cota horizontal-----------------------------
 
-        ax.annotate('', 
+        self.ax.annotate('', 
                 xy=(self.Chapa.c.magnitude*0.1, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.20), 
                 xytext=(self.Chapa.c.magnitude*1.1, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.20), 
                 arrowprops={'arrowstyle': '<->'})
         
-        ax.text(width*0.5, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.25, f'L = {round(self.Chapa.c.magnitude, 2)}', ha='center', va='center',fontsize=8) 
+        self.ax.text(width*0.5, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.25, f'L = {round(self.Chapa.c.magnitude, 2)}', ha='center', va='center',fontsize=8) 
         
-        ax.annotate('', 
+        self.ax.annotate('', 
                 xy=(width/2 - self.g_ch.magnitude/2, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.12), 
                 xytext=(width/2 + self.g_ch.magnitude/2, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.12), 
                 arrowprops={'arrowstyle': '<->'})
         
-        ax.text(width*0.5, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.15, f'{round(self.g_ch.magnitude, 2)}', ha='center', va='center',fontsize=8) 
+        self.ax.text(width*0.5, (self.Viga.h.magnitude + self.Viga.tf.magnitude)*1.15, f'{round(self.g_ch.magnitude, 2)}', ha='center', va='center',fontsize=8) 
 
         
         #--------------------------------------- Adicionar cota Vertical-------------------------------------
-        ax.annotate('', 
+        self.ax.annotate('', 
                     xy=(self.Chapa.c.magnitude*0.07, self.Viga.h.magnitude*0.1), 
                     xytext=(self.Chapa.c.magnitude*0.07, self.Viga.h.magnitude*1.1), 
                     arrowprops={'arrowstyle': '<->'})
         
-        ax.text(self.Chapa.c.magnitude*0.00000001, height*0.5, f'{round(self.Viga.h.magnitude, 2)}', 
+        self.ax.text(self.Chapa.c.magnitude*0.00000001, height*0.5, f'{round(self.Viga.h.magnitude, 2)}', 
                                                                         ha='left', va='center', rotation=90)
         ## Definicao do e inferior
-        ax.annotate('', 
+        self.ax.annotate('', 
                     xy=(self.Chapa.c.magnitude*1.15, self.Viga.h.magnitude*0.1), 
                     xytext=(self.Chapa.c.magnitude*1.15, self.Viga.h.magnitude*0.1 + self.e.magnitude), 
                     arrowprops={'arrowstyle': '<->'})
         
-        ax.text(self.Chapa.c.magnitude*1.16, (self.Viga.h.magnitude*0.1 + 0.5*self.e.magnitude), 
+        self.ax.text(self.Chapa.c.magnitude*1.16, (self.Viga.h.magnitude*0.1 + 0.5*self.e.magnitude), 
                                                 f'{round(self.e.magnitude,2)}', ha='left', va='center',rotation=90)
         
         ## Definicao do e superior
-        ax.annotate('', 
+        self.ax.annotate('', 
                     xy=(self.Chapa.c.magnitude*1.15, self.Viga.h.magnitude*1.1), 
                     xytext=(self.Chapa.c.magnitude*1.15, self.Viga.h.magnitude*1.1 - self.e.magnitude), 
                     arrowprops={'arrowstyle': '<->'})
         
-        ax.text(self.Chapa.c.magnitude*1.16, (self.Viga.h.magnitude*1.1 - 0.5*self.e.magnitude), 
+        self.ax.text(self.Chapa.c.magnitude*1.16, (self.Viga.h.magnitude*1.1 - 0.5*self.e.magnitude), 
                                                 f'{round(self.e.magnitude,2)}', ha='left', va='center',rotation=90)
         
         # Definição das cotas intermediárias
         for i in range(int(self.n_ps/2 - 1)):
                 
-                ax.annotate('', 
+                self.ax.annotate('', 
                     xy=(self.Chapa.c.magnitude*1.15, 
                         self.Viga.h.magnitude*0.1 + self.e.magnitude + self.s.magnitude*i), 
                     
@@ -620,7 +692,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                             self.Viga.h.magnitude*0.1 + self.e.magnitude + self.s.magnitude*(i+1)), 
                     arrowprops={'arrowstyle': '<->'})
         
-                ax.text(self.Chapa.c.magnitude*1.16, 
+                self.ax.text(self.Chapa.c.magnitude*1.16, 
                         (self.Viga.h.magnitude*0.1 + self.e.magnitude + (((i)*2 + 1)*self.s.magnitude)/2), 
                                                 f'{round(self.s.magnitude,2)}', ha='left', va='center',rotation=90)
                 
@@ -642,35 +714,38 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                     edgecolor='black', 
                                     facecolor='white')
                 
-                        ax.add_patch(circle)
+                        self.ax.add_patch(circle)
                         
                         # linha horizontal de centro
-                        ax.plot([(x_i + self.d_h.magnitude/2) + self.d_h.magnitude/2*0.5 , 
+                        self.ax.plot([(x_i + self.d_h.magnitude/2) + self.d_h.magnitude/2*0.5 , 
                         (x_i - self.d_h.magnitude/2) - self.d_h.magnitude/2*0.5], 
                                 [y, y], 
                                 color='red', linestyle='-.', linewidth=1)
                         
                         # linha Vertical de centro
-                        ax.plot([x_i , x_i], 
+                        self.ax.plot([x_i , x_i], 
                         [(y + self.d_h.magnitude/2) + self.d_h.magnitude/2*0.5 , 
                         (y - self.d_h.magnitude/2) - self.d_h.magnitude/2*0.5  ], 
                                 color='red', linestyle='-.', linewidth=1)
 
                         if parafuso_annotate:
                                 parafuso_annotate = False
-                                ax.annotate('', 
+                                self.ax.annotate('', 
                                         xy=(x_e, y), 
                                         xytext=(x_e, y - self.e.magnitude - self.Viga.tf.magnitude - 12), 
                                         arrowprops={'arrowstyle': '->'})
 
-                                ax.text(x_e , (y - self.e.magnitude - self.Viga.tf.magnitude) - 12, f'{self.Parafuso.name}', ha='left', va='center',)
+                                self.ax.text(x_e , (y - self.e.magnitude - self.Viga.tf.magnitude) - 12, f'{self.Parafuso.name}', ha='left', va='center',)
         # Deligando a moldura
 
         plt.axis('off')
 
+        if not self.dev_mode:
+            plt.savefig(os.path.join(self.settings.DATASET_URL,'img','lateral',f'{self.uuid}.png'))
+  
         if show:
-                plt.show()
-        return ax
+            plt.show()
+        
 
 
     def plotView(self, show=True):
@@ -726,6 +801,24 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                 plt.show() # if you need...
         
         return self.ax
+
+    
+    def plotTop(self, show=False):
+        '''
+        Plot da vista superior detalhada
+        '''
+  
+        chapa = patches.Rectangle((1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude ,1 + self.Coluna.bf.magnitude/2 - self.Conectante.c.magnitude/2),
+                                   self.Conectante.t_ch.magnitude, self.Conectante.c.magnitude ,edgecolor='black', facecolor='#D3D3D3') # Desennhando a chapa
+        
+        self.ax_top.add_patch(chapa) # Inserindo no desenho
+        
+        # Salvando a imagem no local correto      
+        if not self.dev_mode:
+            plt.savefig(os.path.join(self.settings.DATASET_URL,'img','top',f'{self.uuid}.png'))
+        
+        if show:
+            plt.show()
 
 
     def mask(self):
@@ -811,7 +904,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
 
         # Salvando a imagem no local correto      
         if not self.dev_mode:
-                plt.savefig(os.path.join(self.settings.DATASET_URL,'img',f'{self.uuid}.png'))
+                plt.savefig(os.path.join(self.settings.DATASET_URL,'img', 'front', f'{self.uuid}.png'))
                 
         
         # Mostrando o gráfico combinado
