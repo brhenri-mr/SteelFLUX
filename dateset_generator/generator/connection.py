@@ -115,7 +115,7 @@ class BasicConnection:
         # Inicializando o desenho padrão
         self.plotBasic()
         self.plotBasicFrontal()
-        self.plotBasicTop()
+        self.plotBasicTop(SHOW=True)
         
     
     def initialize(self):
@@ -203,21 +203,25 @@ class BasicConnection:
         self.ax_frontal.add_patch(coluna)
         
         # ---------------------------------VIGA-----------------------------------------------------
-        mesa1 = patches.Rectangle((centro_x - self.Viga.bf.magnitude/2 + off_set, 
-                                  centro_y + self.Viga.h.magnitude/2 + off_set_y), 
-                                 self.Viga.bf.magnitude - 2, self.Viga.tf.magnitude, edgecolor='black', facecolor='gray', hatch='//')
-        self.ax_frontal.add_patch(mesa1)
+        points = [
+                (centro_x - self.Viga.bf.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude + off_set_y),
+                (centro_x - self.Viga.bf.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x - self.Viga.tw.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x - self.Viga.tw.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x - self.Viga.bf.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x - self.Viga.bf.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + self.Viga.tf.magnitude + off_set_y),
+                (centro_x + self.Viga.bf.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + self.Viga.tf.magnitude + off_set_y),
+                (centro_x + self.Viga.bf.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x + self.Viga.tw.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x + self.Viga.tw.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x + self.Viga.bf.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x + self.Viga.bf.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude + off_set_y),
+        ]
         
-        mesa2 = patches.Rectangle((centro_x - self.Viga.bf.magnitude/2 + off_set, 
-                                  centro_y - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude + off_set_y), 
-                                 self.Viga.bf.magnitude - 2, self.Viga.tf.magnitude, edgecolor='black', facecolor='gray', hatch='//')
-        self.ax_frontal.add_patch(mesa2)
-        
-        alma = patches.Rectangle((centro_x - self.Viga.tw.magnitude/2 + off_set, 
-                                  centro_y - self.Viga.h.magnitude/2 + off_set_y), 
-                                 self.Viga.tw.magnitude, self.Viga.h.magnitude,edgecolor='black', facecolor='gray', hatch='//')
+        # Adicionado A viga
+        perfil = patches.Polygon(points ,closed=True, fill=True, edgecolor='black', hatch='//', facecolor='gray',linewidth=2)
+        self.ax_frontal.add_patch(perfil)
 
-        self.ax_frontal.add_patch(alma)
         plt.axis('off')
 
         if SHOW:
@@ -248,7 +252,7 @@ class BasicConnection:
                 (1, 1)
                 ]
         
-        coluna = patches.Polygon(points, closed=True, fill=True, edgecolor='black', hatch='//', facecolor='gray')
+        coluna = patches.Polygon(points, closed=True, fill=True, edgecolor='black', hatch='//', facecolor='gray',linewidth=2)
         self.ax_top.add_patch(coluna)
         
         #-------------------------------------------------Viga----------------------------------------------------
@@ -1096,8 +1100,6 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                               facecolor='white')
         
         self.ax.add_patch(furo)
-        
-        print(self.Parafuso.d_b.magnitude/2)
         
         for i in range(parafuso_interno-1):
                 
