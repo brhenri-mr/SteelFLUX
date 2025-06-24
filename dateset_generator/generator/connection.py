@@ -854,7 +854,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         '''
         
         #-----------------mascara da imagem lateral----------------
-        """ 
+        
         background = patches.Rectangle((0, 0 ),
                                        self.TAMANHO*1.17, self.TAMANHO*1.17,
                                        edgecolor='black', facecolor='black')
@@ -868,8 +868,8 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         self.ax.add_patch(mask)
               
         # Salavando mascara
-        self.fig.savefig('mask.png', facecolor="white")
-        """
+        self.fig.savefig(os.path.join(self.settings.DATASET_URL,'mask','lateral',f'{self.uuid}.png'), facecolor="black")
+        
         #-----------------mascara da imagem frontal----------------
         
         
@@ -890,11 +890,11 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  zorder=10)
         self.ax_frontal.add_patch(mask)
         
-        self.fig_frontal.savefig('mask.png',facecolor='black')
+        self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'mask','front',f'{self.uuid}.png'), facecolor="black")
          
         #-----------------mascara da imagem superior---------------
         
-        """        # Ocultando o desenho
+        # Ocultando o desenho
         background = patches.Rectangle((0, 0 ),
                                        self.TAMANHO*1.17, self.TAMANHO*1.17, edgecolor='black', facecolor='black')
         
@@ -910,8 +910,8 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         [line.remove() for line in self.ax_top.lines]
         
         # Salavando mascara
-        self.fig_top.savefig('mask.png', facecolor="black")
-        """
+        self.fig_top.savefig(os.path.join(self.settings.DATASET_URL,'mask','top',f'{self.uuid}.png'), facecolor="black")
+        
         return None
 
         
