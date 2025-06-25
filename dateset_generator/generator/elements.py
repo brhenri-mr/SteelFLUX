@@ -152,6 +152,7 @@ class CornerFrame:
         self.name = f'2L {lc}x{t_ch}'
         self.t_ch = t_ch*unit[Dimension_unit]
         self.lc = lc*unit[Dimension_unit] # Comprimento da ligação
+        self.c = lc*unit[Dimension_unit] # Comprimento da ligação
         self.f_yc = f_yc*unit[Resistence_unit]
         self.f_uc = f_uc*unit[Resistence_unit]
 

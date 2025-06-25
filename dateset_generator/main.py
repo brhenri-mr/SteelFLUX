@@ -28,18 +28,17 @@ coluna = Column(
       h=80,
       tf=4.3,
       tw=4.3,
-      bf=200,
+      bf=250,
 )
 
 parafuso = Conector(d_b=16,  f_ub=825)
 
 chapa = Plate(name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
 
-'''cantoneira = CornerFrame(t_ch=3.18,
+cantoneira = CornerFrame(t_ch=3.18,
                              f_yc=345,
                              f_uc=400,
                              lc=120.8)
-
 
 
 lcpp = LCPP(
@@ -50,16 +49,16 @@ lcpp = LCPP(
         uuid=uuid4(),
         s=48,
         Conector=parafuso,
-        dev_mode=False
+        dev_mode=True
     )
     
 
-lcpp.platePlot()'''
+lcpp.plotTop(show=True)
 
-conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=True, uuid=uuid4())
+#conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=True, uuid=uuid4())
 
-conexao.plotConnection()
-conexao.mask()
+#conexao.plotConnection()
+#conexao.mask()
 
 
 """
