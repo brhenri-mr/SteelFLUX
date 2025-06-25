@@ -106,6 +106,7 @@ class BasicConnection:
         self.fig_frontal, self.ax_frontal = plt.subplots(figsize=(8, 6))
         self.fig_top, self.ax_top = plt.subplots(figsize=(8, 6))
         self.TAMANHO = Settings().TAMANHO_IMG
+        self.checked = False
         
         # Inicializando as pastas do dataset
         self.initialize()
@@ -227,7 +228,7 @@ class BasicConnection:
         self.ax_frontal.axis('off')
         
         if not self.dev_mode:
-            self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'base','front',f'{self.uuid}.png'))
+            self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'base','frontal',f'{self.uuid}.png'))
 
         if SHOW:
             plt.show()
@@ -341,7 +342,7 @@ class BasicConnection:
         return min(v_bruta, v_liquida).to(self.Result_unit)
 
 
-    def plateCrush(self) ->float:
+    def plateCrush(self) ->tuple:
         '''
         Status Verificado
         -----------------
@@ -773,7 +774,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         
         # ----------------------------------------Furos-----------------------------------------------------
         
-        furo = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 , 
+        """furo = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 , 
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2 + self.e.magnitude - self.d_h.magnitude/2), 
                                  self.Coluna.tf.magnitude+self.Chapa.t_ch.magnitude, self.d_h.magnitude, edgecolor='black', facecolor='black')
         self.ax.add_patch(furo)
@@ -792,7 +793,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                 self.d_h.magnitude, 
                                 edgecolor='black', facecolor='black')
                 self.ax.add_patch(furo_interno)
-        
+        """
         
         self.ax.annotate('', 
                     xy=(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*0.5, 
@@ -802,6 +803,36 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                     arrowprops={'arrowstyle': '->'})
         self.ax.text(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude,
                 self.TAMANHO/2 + self.Viga.h.magnitude*0.65, f'CH {self.Chapa.t_ch.magnitude}', ha='left', va='center',)
+        
+        #------------------------------------------SOLDA-----------------------------------------------------------------
+        
+        self.ax.annotate('', 
+                    xy=(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude, 
+                        self.TAMANHO/2 + self.Viga.h.magnitude/5 ), 
+                    xytext=(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*1.5 + 15,
+                            self.TAMANHO/2), 
+                    arrowprops={'arrowstyle': '->', 'color':'red'})
+        
+        self.ax.plot([self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*1.5 + 14,
+                      self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*1.5 + 40,],
+                     [self.TAMANHO/2+2, self.TAMANHO/2+2], color='red', lw=0.8)
+        
+        self.ax.plot([self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*1.5 + 25,
+                      self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*1.5 + 30,
+                      self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*1.5 + 30,],
+                     [self.TAMANHO/2+1, self.TAMANHO/2-15, self.TAMANHO/2+1], color='red', lw=0.8)
+        
+        cirle = plt.Circle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*1.5 + 14,
+                            self.TAMANHO/2 + 2),
+                           3.5,edgecolor='red', facecolor='gray')
+        
+        
+        self.ax.text(self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Chapa.t_ch.magnitude*1.5 + 33,
+                self.TAMANHO/2-8, f'{self.welding}', ha='left', va='center', color='red')
+        
+        
+        self.ax.add_patch(cirle)
+        
         
         self.ax.axis('off')
         
@@ -832,13 +863,16 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
             plt.show()
 
 
-    def plotConnection(self):
+    def plotConnection(self, show=False):
         '''
         Função para plotar a conexão feita
         '''
+        if not self.checked:
+            raise 'Elemento não verificado'
+        
         self.platePlot() # Conexão frontal
         self.plotLateral() # conexão lateral
-        self.plotTop() # Conexão superior
+        self.plotTop(show=show) # Conexão superior
         
 
     def mask(self):
@@ -856,7 +890,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         
         mask = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1 + self.lc.magnitude, 
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2-self.Viga.tf.magnitude-10),
-                                 self.Conectante.t_ch.magnitude+30, self.Viga.h.magnitude+50, 
+                                 self.Conectante.t_ch.magnitude*1.5 + 45, self.Viga.h.magnitude+50, 
                                  edgecolor='white', facecolor='white', zorder=10)
         self.ax.add_patch(mask)
               
@@ -883,7 +917,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  zorder=10)
         self.ax_frontal.add_patch(mask)
         
-        self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'mask','front',f'{self.uuid}.png'), facecolor="black")
+        self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'mask','frontal',f'{self.uuid}.png'), facecolor="black")
          
         #-----------------mascara da imagem superior---------------
         
@@ -1008,23 +1042,54 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         raise AttributeError('O cálculo da pressão de contato na viga apoiada não é aplicada a esse tipo de conexão') 
 
 
-    def plateWelding(self):
-        pass
+    def plateWelding(self, Fv, fw=415, THICKNESS=[6, 8]):
+        '''
+        Status Verificado
+        -----------------
+        
+        Cálculo da resistência necessária de solda
+        '''
+        
+        for thick in THICKNESS:
+            # Conferencia da resistência da solda
+            aw = 0.70711*(thick*unit['millimeter'])*self.Viga.h
+            
+            tau_rd_solda = aw*0.6*(fw*unit['megapascal'])/self.coef
+            
+            tau_rd_metal_base =  self.Viga.tw*self.Viga.h*0.6*self.Viga.fy/self.coef1
+            
+            tau_rd = 2*min(tau_rd_metal_base, tau_rd_solda)
+
+            if tau_rd>=Fv:
+                self.welding = thick
+                return tau_rd.to(self.Result_unit)
+            
+        return 0
 
 
-    def analyze(self):
+    def analyze(self, Fv):
         """
         Análise do dimensionamento da conexão e suas partes constituintes
         """
-        return {
+        Fv = Fv*unit['kilonewton']
+        
+        saida = {
             "blockShear":self.blockShear(),
             "plateBearing":self.plateBearing(),
             "blotShear":self.boltShear(),
             "platShear":self.plateShear(),
             "plateCrush":self.plateCrush(),
             "beamWebShear":self.beamWebShear(),
-            "crushBeam":self.crushBeam()
+            "welding":self.plateWelding(Fv)
         }
+        
+        for chave, element in saida.items():
+            if isinstance(element, tuple):
+                element = element[0]
+            
+            assert element>Fv, f'{chave} não verificado: {element} para {Fv} de solicitação'
+        self.checked = True
+        return saida
 
 
 class LCPP(BoltChecker, BeamChecker, BasicConnection):
@@ -1173,15 +1238,15 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         #--------------------------------NOMENCLATURA DA CHAPA-------------------------------------------------
         
         self.ax.annotate('', 
-                    xy=(chapa_ponto_init[0] + self.Conectante.lc.magnitude/2, 
-                        chapa_ponto_init[1] + 10), 
+                    xy=(chapa_ponto_init[0] + self.Conectante.t_ch.magnitude/2, 
+                        chapa_ponto_init[1] + self.Conectante.lc.magnitude - 10), 
                     
-                    xytext=(chapa_ponto_init[0] + self.Conectante.lc.magnitude/2 + 25,
-                            chapa_ponto_init[1] + 10 - self.TAMANHO/3 + 50), 
+                    xytext=(chapa_ponto_init[0] + self.Conectante.t_ch.magnitude/2 + 25,
+                            self.TAMANHO/2 + self.Viga.h.magnitude/2 + self.Viga.tf.magnitude + 10), 
                     arrowprops={'arrowstyle': '->'})
         
-        self.ax.text(chapa_ponto_init[0] + self.Conectante.lc.magnitude/2 + 25, 
-                        (chapa_ponto_init[1] + 10 - self.TAMANHO/3 + 50), 
+        self.ax.text(chapa_ponto_init[0] + self.Conectante.t_ch.magnitude/2 + 25, 
+                        (self.TAMANHO/2 + self.Viga.h.magnitude/2 + self.Viga.tf.magnitude + 10), 
                                                 f'{self.Conectante.name}', ha='left', va='center')       
         
         
@@ -1323,30 +1388,103 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
     
     
     def mask(self):
-        pass
+        #-----------------mascara da imagem lateral----------------
+        
+        background = patches.Rectangle((0, 0 ),
+                                       self.TAMANHO*1.17, self.TAMANHO*1.17,
+                                       edgecolor='black', facecolor='black')
+        
+        self.ax.add_patch(background)
+        
+        mask = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1, 
+                                  self.TAMANHO/2 - self.Viga.h.magnitude/2-self.Viga.tf.magnitude-10),
+                                 self.Conectante.t_ch.magnitude + self.Conectante.lc.magnitude + 30, self.Viga.h.magnitude + 50, 
+                                 edgecolor='white', facecolor='white', zorder=10)
+        self.ax.add_patch(mask)
+              
+        # Salavando mascara
+        self.fig.savefig(os.path.join(self.settings.DATASET_URL,'mask','lateral',f'{self.uuid}.png'), facecolor="black")
+        
+        #-----------------mascara da imagem frontal----------------
+        
+        
+        
+        background = patches.Rectangle(((self.Conectante.c.magnitude*0.1 + self.Conectante.c.magnitude)/2 + self.Conectante.c.magnitude*0.05 - self.Coluna.bf.magnitude/2 ,
+                                        -self.TAMANHO/2),
+                                       self.Coluna.bf.magnitude , self.TAMANHO*2,
+                                       edgecolor='black', 
+                                       facecolor='black',
+                                       zorder=9)
+                                       
+        self.ax_frontal.add_patch(background)
+        width = self.Conectante.c.magnitude*1.2
+        mask = patches.Rectangle((-width*0.5, self.Viga.h.magnitude*0.1 - self.Viga.tf.magnitude - 16),
+                                 width*1.5 + 70, 
+                                 self.Viga.h.magnitude*1.25 +self.Viga.tf.magnitude*2.25+16, 
+                                 edgecolor='white', 
+                                 facecolor='white',
+                                 zorder=10)
+        self.ax_frontal.add_patch(mask)
+        
+        self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'mask','frontal',f'{self.uuid}.png'), facecolor="black")
+         
+        #-----------------mascara da imagem superior---------------
+        
+        # Ocultando o desenho
+        background = patches.Rectangle((0, 0 ),
+                                       self.TAMANHO*1.17, self.TAMANHO*1.17, edgecolor='black', facecolor='black')
+        
+        self.ax_top.add_patch(background)
+        
+        # Inserindo mascara
+        mask = patches.Rectangle((1 + self.Coluna.tf.magnitude*2 + self.Coluna.h.magnitude, 
+                                  1 + self.Coluna.bf.magnitude/2 - self.Conectante.lc.magnitude - self.Viga.tw.magnitude),
+                                 self.Conectante.t_ch.magnitude + 50, self.Conectante.lc.magnitude*2 + self.Viga.tw.magnitude + 10, edgecolor='white', facecolor='white', zorder=10)
+        self.ax_top.add_patch(mask)
+        
+        # Removendo as linhas que dão problema
+        [line.remove() for line in self.ax_top.lines]
+        
+        # Salavando mascara
+        self.fig_top.savefig(os.path.join(self.settings.DATASET_URL,'mask','top',f'{self.uuid}.png'), facecolor="black")
+        
+        return None
     
     
-    def plotConnection(self):
+    def plotConnection(self, show=False):
         '''
         Plotagem da conexão completa
         '''
+        if not self.checked:
+            raise 'Elemento não verificado'
+        
         self.plotLateral()
         self.plotFrontal()
-        self.plotTop()
+        self.plotTop(show=show)
     
-    
-    def analyze(self):
+    def analyze(self, Fv):
         """
         Análise do dimensionamento da conexão e suas partes constituintes
         """
-        return {
-            "blockshear":self.blockShear(),
+        Fv = Fv*unit['kilonewton']
+        
+        saida = {
             "blotShear":self.boltShear(),
-            "platShear":self.plateShear(),
             "plateCrush":self.angleCrush(),
             "beamWebShear":self.beamWebShear(),
-            "crushBeam":self.crushBeam()
+            "crushBeam":self.crushBeam(),
+            "platShear":self.plateShear(),
+            "blockshear":self.blockShear(),
         }
+        
+        for chave, element in saida.items():
+            if isinstance(element, tuple):
+                element = element[0]
+            
+            assert element>Fv, f'{chave} não verificado: {element} para {Fv} de solicitação'
+        
+        self.checked = True
+        return saida
 
 
     def blockShear(self):

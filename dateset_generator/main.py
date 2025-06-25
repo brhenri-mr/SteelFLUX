@@ -4,7 +4,7 @@ import pandas as pd
 from generator.db import load_data
 from uuid import uuid4
 
-solicitacao = 80 # KN
+solicitacao = 50 # KN
 
 
 saida = pd.DataFrame(columns=['Perfil', 'Chapa', 'Bitola','Material', 's', 'Parafuso', 'Block', 
@@ -52,12 +52,14 @@ lcpp = LCPP(
         dev_mode=True
     )
     
+lcpp.analyze(solicitacao)
+#lcpp.plotConnection(show=True)
+#lcpp.mask()
+#conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna,n_ps=4 ,s=60, g_ch=120, dev_mode=True, uuid=uuid4())
 
-lcpp.plotTop(show=True)
+#conexao.analyze(solicitacao)
 
-#conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna, n_ps=4 ,s=60, g_ch=120, dev_mode=True, uuid=uuid4())
-
-#conexao.plotConnection()
+#conexao.plotLateral()
 #conexao.mask()
 
 
