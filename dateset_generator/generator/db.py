@@ -5,6 +5,7 @@ from settings import Settings
 from uuid import UUID
 
 def load_data(nome_perfil:str,
+              name:str,
               nome_chapa:str,
               bitola_parafuso:int,
               material_chapa:str,
@@ -39,6 +40,7 @@ def load_data(nome_perfil:str,
         
         # Novo banco de dados
         new_db = Dados(nome_perfil=nome_perfil,
+                    name=name,
                     nome_chapa=nome_chapa,
                     bitola_parafuso=bitola_parafuso,
                     material_chapa=material_chapa,

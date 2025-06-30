@@ -84,6 +84,7 @@ class BasicConnection:
         self.Coluna = Coluna
         self.Viga = Viga
         self.s = s*unit[Dimension_unit] # Distancia entre centroide de furo interno
+        self.Conector = Conector
         
         # Tentando verificar a distância da borda com uma valor de tamanho de Conectante
         try:
@@ -93,11 +94,10 @@ class BasicConnection:
     
         except:
             self.lc = 0*unit[Dimension_unit]
-            self.e = (Viga.h - (n_ps/2 -1)*self.s)/2 # Distancia entre centro do furo e borda vertical
-            
-        assert self.e.magnitude>0, 'Distância entre furos (s) está superando o comprimento da chapa'
+            self.e = (Viga.h - (n_ps/2 - 1)*self.s)/2 # Distancia entre centro do furo e borda vertical
         
-        assert s>= 3*Conector.d_b.magnitude, 'Distância entre furos insuficiente' # Distância mínima entre furos Iterm 6.3.9
+        # Verificações da conformidade geométrica
+        self.check()
             
         self.Result_unit = Result_unit
         self.coef = coef
@@ -116,6 +116,15 @@ class BasicConnection:
         self.plotBasicFrontal()
         self.plotBasicTop()
         
+    
+    def check(self):
+        """
+        Verificar a conformidade geométrica da conexão
+        """
+        assert self.e.magnitude>0, 'Distância entre furos (s) está superando o comprimento da chapa'
+        assert self.e.magnitude>self.d_h.magnitude/2, "Distância entre furo e borda inferior ao raio do furo"
+        
+        assert self.s.magnitude>= 3*self.Conector.d_b.magnitude, 'Distância entre furos insuficiente' # Distância mínima entre furos Iterm 6.3.9
     
     def initialize(self):
         '''
@@ -746,7 +755,6 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         
         # Deligando a moldura
         self.ax_frontal.axis('off')
-
         if not self.dev_mode:
             self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'img','frontal',f'{self.uuid}.png'))
   
@@ -1086,7 +1094,6 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         for chave, element in saida.items():
             if isinstance(element, tuple):
                 element = element[0]
-            
             assert element>Fv, f'{chave} não verificado: {element} para {Fv} de solicitação'
         self.checked = True
         return saida

@@ -33,8 +33,6 @@ coluna = Column(
 
 parafuso = Conector(d_b=16,  f_ub=825)
 
-chapa = Plate(name='CH 1/4"',c= 200,f_uc=250, f_yc=400)
-
 cantoneira = CornerFrame(t_ch=3.18,
                              f_yc=345,
                              f_uc=400,
@@ -55,13 +53,6 @@ cantoneira = CornerFrame(t_ch=3.18,
 lcpp.analyze(solicitacao)"""
 #lcpp.plotConnection(show=True)
 #lcpp.mask()
-conexao = EndPLate(Conector=parafuso, Plate=chapa,Viga=viga,Coluna=coluna,n_ps=4 ,s=60, g_ch=120, dev_mode=False, uuid=uuid4())
-
-conexao.analyze(solicitacao)
-
-conexao.plotConnection()
-conexao.mask()
-
 
 """
 for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5/8"', 'CH 3/4"', 'CH 7/8"' ]:

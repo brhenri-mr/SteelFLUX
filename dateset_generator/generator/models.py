@@ -14,6 +14,9 @@ class Dados():
     # id
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
     
+    # Categoria da conexão
+    name: Mapped[str]
+    
     # Identificador unico
     uuid: Mapped[UUID]
     
