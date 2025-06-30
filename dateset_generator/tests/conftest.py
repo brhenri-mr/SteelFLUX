@@ -24,6 +24,8 @@ def parafuso():
 def coluna():
     coluna = Column(
       name='w',
+      tw=4.3,
+      bf=200,
       h=80,
       tf=4.3
     )
@@ -34,6 +36,7 @@ def coluna():
 @pytest.fixture()
 def viga():
     viga = Beam(name='W150x13',
+            bf=200,
             tw=4.3,
             tf=4.3,
             h=150,

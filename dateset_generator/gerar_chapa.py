@@ -75,7 +75,7 @@ for chapa_tipo in ['CH 1/4"','CH 3/16"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                                           Viga=viga,
                                           Coluna=coluna,
                                           n_ps=2*i,
-                                          s=element*3.2,
+                                          s=element*3.01, # Garantir mais que o espaçamento mínimo,
                                           g_ch=120,
                                           dev_mode=False,
                                           uuid=uuid)

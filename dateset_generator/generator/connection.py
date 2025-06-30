@@ -111,11 +111,6 @@ class BasicConnection:
         # Inicializando as pastas do dataset
         self.initialize()
         
-        # Inicializando o desenho padrão
-        self.plotBasic()
-        self.plotBasicFrontal()
-        self.plotBasicTop()
-        
     
     def check(self):
         """
@@ -125,6 +120,7 @@ class BasicConnection:
         assert self.e.magnitude>self.d_h.magnitude/2, "Distância entre furo e borda inferior ao raio do furo"
         
         assert self.s.magnitude>= 3*self.Conector.d_b.magnitude, 'Distância entre furos insuficiente' # Distância mínima entre furos Iterm 6.3.9
+    
     
     def initialize(self):
         '''
@@ -185,6 +181,7 @@ class BasicConnection:
         
         if not self.dev_mode:
             self.fig.savefig(os.path.join(self.settings.DATASET_URL,'base','lateral',f'{self.uuid}.png'))
+            plt.close(self.fig)
         
         
     def plotBasicFrontal(self, SHOW=False):
@@ -238,6 +235,7 @@ class BasicConnection:
         
         if not self.dev_mode:
             self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'base','frontal',f'{self.uuid}.png'))
+            plt.close(self.fig_frontal)
 
         if SHOW:
             plt.show()
@@ -294,6 +292,7 @@ class BasicConnection:
 
         if not self.dev_mode:
             self.fig_top.savefig(os.path.join(self.settings.DATASET_URL,'base','top',f'{self.uuid}.png'))
+            plt.close(self.fig_top)
 
         if SHOW:
             plt.show()
@@ -337,7 +336,7 @@ class BasicConnection:
         
         '''
         # Área bruta da seção 
-        ag = ((0.5*self.n_ps - 1)*self.s + 2*self.e)*self.Conectante.t_ch
+        ag = self.Viga.h*self.Conectante.t_ch
         
         v_bruta = 2*0.6*self.Conectante.f_yc*ag/self.coef1
         
@@ -462,8 +461,8 @@ class BeamChecker:
         
         '''
         # Área bruta da seção
-        ag = ((self.n_ps*0.5 - 1)*self.s + 2*self.e)*self.Viga.tw
-        
+        ag = self.Viga.h*self.Viga.tw
+   
         return (0.6*self.Viga.fy*ag/self.coef1).to(self.Result_unit)
 
 
@@ -627,6 +626,12 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         # Caso seja True, as imagens não serão salvar
         # Caso contrario, serão
         self.dev_mode = dev_mode
+        
+        # Inicializando o desenho padrão
+        self.plotBasic()
+        self.plotBasicFrontal()
+        self.plotBasicTop()
+        
 
 
     def platePlot(self, show=False): 
@@ -757,6 +762,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         self.ax_frontal.axis('off')
         if not self.dev_mode:
             self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'img','frontal',f'{self.uuid}.png'))
+            plt.close(self.fig_frontal)
   
         if show:
             plt.show()
@@ -846,6 +852,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         
         if not self.dev_mode:
             self.fig.savefig(os.path.join(self.settings.DATASET_URL,'img', 'lateral', f'{self.uuid}.png'))
+            plt.close(self.fig)
         
         if show:
                 plt.show() # if you need...
@@ -866,6 +873,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         # Salvando a imagem no local correto      
         if not self.dev_mode:
             self.fig_top.savefig(os.path.join(self.settings.DATASET_URL,'img','top',f'{self.uuid}.png'))
+            plt.close(self.fig_top)
         
         if show:
             plt.show()
@@ -904,6 +912,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
               
         # Salavando mascara
         self.fig.savefig(os.path.join(self.settings.DATASET_URL,'mask','lateral',f'{self.uuid}.png'), facecolor="black")
+        plt.close(self.fig)
         
         #-----------------mascara da imagem frontal----------------
         
@@ -925,7 +934,8 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  zorder=10)
         self.ax_frontal.add_patch(mask)
         
-        self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'mask','frontal',f'{self.uuid}.png'), facecolor="black")
+        self.fig_frontal.savefig1(os.path.join(self.settings.DATASET_URL,'mask','frontal',f'{self.uuid}.png'), facecolor="black")
+        plt.close(self.fig_frontal)
          
         #-----------------mascara da imagem superior---------------
         
@@ -946,6 +956,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         
         # Salavando mascara
         self.fig_top.savefig(os.path.join(self.settings.DATASET_URL,'mask','top',f'{self.uuid}.png'), facecolor="black")
+        plt.close(self.fig_top)
         
         return None
 
@@ -1115,7 +1126,10 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                  dev_mode=True,
                  Dimension_unit='millimeter',
                  Result_unit='kilonewton'):
-         
+        
+        self.Conectante = Angle
+        self.Conector = Conector
+        
         BoltChecker.__init__(self, Conector, n_ps, coef, Result_unit)
 
 
@@ -1141,13 +1155,23 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                              Result_unit=Result_unit, 
                              coef1=coef1)
         
+
+        
         self.check()
+        
+        # Inicializando o desenho padrão
+        self.plotBasic()
+        self.plotBasicFrontal()
+        self.plotBasicTop()
+        
     
     
     def check(self):
+        assert self.e.magnitude>0, 'Cantoneira com espaço insuficiente'
         assert self.Conectante.lc.magnitude < self.Viga.h.magnitude, 'Cantoneira maior que alma da viga'
         assert self.Conectante.lc.magnitude < self.Coluna.bf.magnitude/2, 'Cantoneira maior que o flange da coluna'
-    
+        assert self.lc.magnitude - self.Conectante.t_ch.magnitude> self.Conector.d_b.magnitude, 'Furo maior que comprimento da cantoneira'
+        assert self.e.magnitude> self.Conector.d_b.magnitude/2, 'Distancia entre furo e centro menor que raio do Furo'
     
     def plotLateral(self, show=False):
         '''
@@ -1198,6 +1222,20 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                 [(y + self.d_h.magnitude/2) + self.d_h.magnitude/2*0.5 , 
                 (y - self.d_h.magnitude/2) - self.d_h.magnitude/2*0.5  ], 
                         color='red', linestyle='-.', linewidth=1)
+        
+        
+        #-------------------------------------Definição Cotas Horizontais----------------------------
+        self.ax.annotate('', 
+                    xy=(chapa_ponto_init[0] + self.lc.magnitude + 2, 
+                        chapa_ponto_init[1] + self.lc.magnitude + 10), 
+                    
+                    xytext=(x_i ,
+                            chapa_ponto_init[1] + self.lc.magnitude + 10), 
+                    arrowprops={'arrowstyle': '<->'})
+        
+        self.ax.text(x_i, 
+                        chapa_ponto_init[1] + self.lc.magnitude + 18, 
+                                                f'{round(self.e.magnitude,2)}', ha='left', va='center')  
         
                 
         #-----------------------------------------------------------------------------------------------
@@ -1259,9 +1297,11 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         
         self.ax.set_aspect('equal')
         self.ax.axis('off')
-        
+
         if not self.dev_mode:
+
             self.fig.savefig(os.path.join(self.settings.DATASET_URL,'img', 'lateral', f'{self.uuid}.png'))
+            plt.close(self.fig)
         
         if show:
             plt.show() 
@@ -1364,7 +1404,8 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         self.ax_frontal.axis('off')
         
         if not self.dev_mode:
-            self.fig_top.savefig(os.path.join(self.settings.DATASET_URL,'img','frontal',f'{self.uuid}.png'))
+            self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'img','frontal',f'{self.uuid}.png'))
+            plt.close(self.fig_frontal)
 
         if show:
                 plt.show()
@@ -1389,6 +1430,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                   
         if not self.dev_mode:
             self.fig_top.savefig(os.path.join(self.settings.DATASET_URL,'img','top',f'{self.uuid}.png'))
+            plt.close(self.fig_top)
 
         if show:
             plt.show()
@@ -1411,6 +1453,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
               
         # Salavando mascara
         self.fig.savefig(os.path.join(self.settings.DATASET_URL,'mask','lateral',f'{self.uuid}.png'), facecolor="black")
+        plt.close(self.fig)
         
         #-----------------mascara da imagem frontal----------------
         
@@ -1434,6 +1477,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         self.ax_frontal.add_patch(mask)
         
         self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'mask','frontal',f'{self.uuid}.png'), facecolor="black")
+        plt.close(self.fig_frontal)
          
         #-----------------mascara da imagem superior---------------
         
@@ -1454,6 +1498,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         
         # Salavando mascara
         self.fig_top.savefig(os.path.join(self.settings.DATASET_URL,'mask','top',f'{self.uuid}.png'), facecolor="black")
+        plt.close(self.fig_top)
         
         return None
     
@@ -1481,13 +1526,12 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
             "beamWebShear":self.beamWebShear(),
             "crushBeam":self.crushBeam(),
             "platShear":self.plateShear(),
-            "blockshear":self.blockShear(),
+            #"blockshear":self.blockShear(),
         }
         
         for chave, element in saida.items():
             if isinstance(element, tuple):
                 element = element[0]
-            
             assert element>Fv, f'{chave} não verificado: {element} para {Fv} de solicitação'
         
         self.checked = True

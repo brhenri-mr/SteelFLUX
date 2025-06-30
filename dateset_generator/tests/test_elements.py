@@ -9,9 +9,13 @@ def test_column():
     # Entradas
     entrada = {'name':1,
                'tf':1,
+               'bf':200,
+               'tf':4.8,
                'h':1}
     
     coluna = Column(name=entrada['name'],
+                    bf=200,
+                    tw=4.8,
                     tf=entrada['tf'],
                     h=entrada['h'],
                     )
@@ -94,12 +98,14 @@ def test_beam():
     entrada = {'name':1,
                'h':1,
                'tw':1,
+               'bf':1,
                'tf':1,
                'fy':1,
                'fu':1}
     
     viga = Beam(name=entrada['name'],
                   h=entrada['h'],
+                  bf=entrada['bf'],
                   tf=entrada['tf'],
                   tw=entrada['tw'],
                   fy=entrada['fy'],

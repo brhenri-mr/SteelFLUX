@@ -10,10 +10,52 @@ solicitacao = 50 # KN
 saida = pd.DataFrame(columns=['Perfil', 'Chapa', 'Bitola','Material', 's', 'Parafuso', 'Block', 
                               'ShearPlate', 'PlateCrush', 'boltShear', 'webShear', 'FS'])
 
-bitolas = [16, 20, 22 ,24 , 27 , 30, 36]
+bitolas = [16, 20, 22 ,24 , 27 , 30]
 material = {'A36': {'fy':250, 'fu':400}, 
             'A527_GR50':{'fy':345, 'fu':450},
             'A527_GR55':{'fy':380, 'fu':485}}
+
+cantoneira_dados = {
+    "8”": [
+        {"b_mm": 203.2, "peso_kg_m": 48.7, "t_pol": "5/8”", "t_mm": 15.88},
+        {"b_mm": 203.2, "peso_kg_m": 57.9, "t_pol": "3/4”", "t_mm": 19.05},
+    ],
+    "3”": [
+        {"b_mm": 76.2, "peso_kg_m": 5.52, "t_pol": "3/16”", "t_mm": 4.76},
+        {"b_mm": 76.2, "peso_kg_m": 7.29, "t_pol": "1/4”", "t_mm": 6.35},
+        {"b_mm": 76.2, "peso_kg_m": 9.07, "t_pol": "5/16”", "t_mm": 7.94},
+        {"b_mm": 76.2, "peso_kg_m": 10.71, "t_pol": "3/8”", "t_mm": 9.52},
+        {"b_mm": 76.2, "peso_kg_m": 14.0, "t_pol": "1/2”", "t_mm": 2.7},
+    ],
+    "3.1/2”": [
+        {"b_mm": 88.9, "peso_kg_m": 8.56, "t_pol": "1/4”", "t_mm": 6.35},
+        {"b_mm": 88.9, "peso_kg_m": 10.59, "t_pol": "5/16”", "t_mm": 7.94},
+        {"b_mm": 88.9, "peso_kg_m": 12.58, "t_pol": "3/8”", "t_mm": 9.52},
+    ],
+    "4”": [
+        {"b_mm": 101.6, "peso_kg_m": 9.81, "t_pol": "1/4”", "t_mm": 6.35},
+        {"b_mm": 101.6, "peso_kg_m": 12.19, "t_pol": "5/16”", "t_mm": 7.94},
+        {"b_mm": 101.6, "peso_kg_m": 14.57, "t_pol": "3/8”", "t_mm": 9.52},
+        {"b_mm": 101.6, "peso_kg_m": 16.8, "t_pol": "7/16”", "t_mm": 11.11},
+        {"b_mm": 101.6, "peso_kg_m": 19.03, "t_pol": "1/2”", "t_mm": 12.7},
+    ],
+    "5”": [
+        {"b_mm": 127, "peso_kg_m": 12.34, "t_pol": "1/4”", "t_mm": 6.35},
+        {"b_mm": 127, "peso_kg_m": 15.31, "t_pol": "5/16”", "t_mm": 7.94},
+        {"b_mm": 127, "peso_kg_m": 18.3, "t_pol": "3/8”", "t_mm": 9.52},
+        {"b_mm": 127, "peso_kg_m": 24.1, "t_pol": "1/2”", "t_mm": 1.27},
+        {"b_mm": 127, "peso_kg_m": 29.8, "t_pol": "5/8”", "t_mm": 15.88},
+        {"b_mm": 127, "peso_kg_m": 23.52, "t_pol": "7/16”", "t_mm": 11.11},
+    ],
+    "6”": [
+        {"b_mm": 152.4, "peso_kg_m": 22.2, "t_pol": "3/8”", "t_mm": 9.52},
+        {"b_mm": 152.4, "peso_kg_m": 29.2, "t_pol": "1/2”", "t_mm": 12.7},
+        {"b_mm": 152.4, "peso_kg_m": 36.0, "t_pol": "5/8”", "t_mm": 15.88},
+        {"b_mm": 152.4, "peso_kg_m": 42.7, "t_pol": "3/4”", "t_mm": 19.05},
+    ]
+}
+
+
 
 viga = Beam(name='W150x13',
             tw=4.3,
@@ -33,11 +75,6 @@ coluna = Column(
 
 parafuso = Conector(d_b=16,  f_ub=825)
 
-cantoneira = CornerFrame(t_ch=3.18,
-                             f_yc=345,
-                             f_uc=400,
-                             lc=120.8)
-
 
 """lcpp = LCPP(
         Viga=viga,
@@ -54,8 +91,9 @@ lcpp.analyze(solicitacao)"""
 #lcpp.plotConnection(show=True)
 #lcpp.mask()
 
-"""
-for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5/8"', 'CH 3/4"', 'CH 7/8"' ]:
+
+for el in cantoneira_dados.keys():
+    for el_coner in cantoneira_dados[el]:
       for nome, materia_chapa in material.items():
             for element in bitolas:
                   i = 0
@@ -63,58 +101,50 @@ for chapa_tipo in ['CH 3/16"','CH 1/4"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                         i += 1
                         try:
                               uuid = uuid4()
-                              chapa = Plate(    name=chapa_tipo,
-                                                c= 200,
-                                                f_uc=materia_chapa['fu'],
-                                                f_yc=materia_chapa['fy'])
-                              
-                              
-                              print(f'Teste com {element} para {i*2} parafusos com chapa {chapa_tipo} {nome}')
+                              cantoneira = CornerFrame(t_ch=el_coner['t_mm'],
+                                                        f_yc=345,
+                                                        f_uc=400,
+                                                        lc=el_coner['b_mm'])
+
+                              print(f'Teste com {element} para {i*2} parafusos com cantoneira 2xL{el}x{el_coner['t_mm']} {nome}')
                               parafuso = Conector(d_b=element,
                                                 f_ub=825)
                               
-                              conexao = EndPLate(Conector=parafuso,
-                                          Plate=chapa,
-                                          Viga=viga,
-                                          Coluna=coluna,
-                                          n_ps=2*i,
-                                          s=element*3.2,
-                                          g_ch=120,
-                                          dev_mode=False,
-                                          uuid=uuid)
-                                    
-                              block = conexao.blockShear()
+                              conexao = LCPP(
+                                                    Viga=viga,
+                                                    Coluna=coluna,
+                                                    Angle=cantoneira,
+                                                    n_ps=2*i,
+                                                    uuid=uuid4(),
+                                                    s=element*3.01,
+                                                    dev_mode=False,
+                                                    Conector=parafuso,
+                                                )
                               
-                              Vrd = conexao.plateShear()
-
-                              F, indv = conexao.plateCrush()
-
-                              F_vRd = conexao.boltShear()
-
-                              #web = conexao.beamWebShear()
-
-                              FS = solicitacao/min(block, Vrd, F_vRd, F).magnitude
+                              dimensionamento = conexao.analyze(solicitacao)
                               
-                              ret = load_data(nome_perfil = 'W150x13',
-                                          nome_chapa = chapa_tipo,
-                                          bitola_parafuso = element,
-                                          material_chapa = nome,
-                                          distancia_s = 3.2*element,
-                                          qntd_parafusos = i*2,
-                                          fs = FS,
-                                          bolt_shear=F_vRd,
-                                          block = block,
-                                          shear_plate = Vrd,
-                                          plate_crush = F,
-                                          web_shear = 0,
-                                          uuid=uuid,
-                                          solicitacao=solicitacao,)
-      
-                              conexao.plotConnection(show=False)
-                              conexao.mask()
+                              if dimensionamento:
+                                Vrd, F_vRd, F = dimensionamento['platShear'], dimensionamento['blotShear'], dimensionamento['plateCrush'][0]
+                                FS = solicitacao/min(Vrd, F_vRd, F).magnitude
+                                ret = load_data(nome_perfil = 'W150x13',
+                                            name='LLCP',
+                                            nome_chapa = f'2L{el}',
+                                            bitola_parafuso = element,
+                                            material_chapa = nome,
+                                            distancia_s = 3.01*element,
+                                            qntd_parafusos = i*2,
+                                            fs = FS,
+                                            bolt_shear=F_vRd,
+                                            block = 0,
+                                            shear_plate = Vrd,
+                                            plate_crush = F,
+                                            web_shear = 0,
+                                            uuid=uuid,
+                                            solicitacao=solicitacao,)
+                                conexao.plotConnection()
+                                conexao.mask()
                               
                         except AssertionError as e:
                               print(f'Falha em {element} para o conjunto com {i*2} parafusos')
                               print(f'{e}')
                               break
-"""
