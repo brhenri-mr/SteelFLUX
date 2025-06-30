@@ -934,7 +934,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  zorder=10)
         self.ax_frontal.add_patch(mask)
         
-        self.fig_frontal.savefig1(os.path.join(self.settings.DATASET_URL,'mask','frontal',f'{self.uuid}.png'), facecolor="black")
+        self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'mask','frontal',f'{self.uuid}.png'), facecolor="black")
         plt.close(self.fig_frontal)
          
         #-----------------mascara da imagem superior---------------
@@ -1233,7 +1233,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
                             chapa_ponto_init[1] + self.lc.magnitude + 10), 
                     arrowprops={'arrowstyle': '<->'})
         
-        self.ax.text(x_i, 
+        self.ax.text(chapa_ponto_init[0] + self.lc.magnitude + self.e.magnitude/2, 
                         chapa_ponto_init[1] + self.lc.magnitude + 18, 
                                                 f'{round(self.e.magnitude,2)}', ha='left', va='center')  
         
