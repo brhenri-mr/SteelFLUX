@@ -634,7 +634,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         
 
 
-    def platePlot(self, show=False): 
+    def plotFrontal(self, show=False): 
         '''
         Vista Frontal detalhada
         '''
@@ -886,7 +886,7 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
         if not self.checked:
             raise 'Elemento não verificado'
         
-        self.platePlot() # Conexão frontal
+        self.plotFrontal() # Conexão frontal
         self.plotLateral() # conexão lateral
         self.plotTop(show=show) # Conexão superior
         
