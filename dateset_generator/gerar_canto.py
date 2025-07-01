@@ -116,7 +116,7 @@ for el in cantoneira_dados.keys():
                                                     Coluna=coluna,
                                                     Angle=cantoneira,
                                                     n_ps=2*i,
-                                                    uuid=uuid4(),
+                                                    uuid=uuid,
                                                     s=element*3.01,
                                                     dev_mode=False,
                                                     Conector=parafuso,
