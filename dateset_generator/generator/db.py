@@ -34,7 +34,7 @@ def load_data(nome_perfil:str,
                             shear_plate = shear_plate.magnitude,
                             plate_crush = plate_crush.magnitude,
                             bolt_shear=bolt_shear.magnitude,
-                            web_shear=web_shear,
+                            web_shear=web_shear.magnitude,
                             uuid=uuid
                             )
         

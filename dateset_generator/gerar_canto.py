@@ -3,6 +3,7 @@ from generator.connection import EndPLate, LCPP
 import pandas as pd
 from generator.db import load_data
 from uuid import uuid4
+from generator.unit import unit
 
 solicitacao = 50 # KN
 
@@ -124,21 +125,21 @@ for el in cantoneira_dados.keys():
                               dimensionamento = conexao.analyze(solicitacao)
                               
                               if dimensionamento:
-                                Vrd, F_vRd, F = dimensionamento['platShear'], dimensionamento['blotShear'], dimensionamento['plateCrush'][0]
+                                Vrd, F_vRd, F, web_shear = dimensionamento['platShear'], dimensionamento['blotShear'], dimensionamento['plateCrush'][0], dimensionamento['beamWebShear']
                                 FS = solicitacao/min(Vrd, F_vRd, F).magnitude
                                 ret = load_data(nome_perfil = 'W150x13',
                                             name='LLCP',
-                                            nome_chapa = f'2L{el}',
+                                            nome_chapa = f'2xL{el}x{el_coner['t_mm']} {nome}',
                                             bitola_parafuso = element,
                                             material_chapa = nome,
                                             distancia_s = 3.01*element,
                                             qntd_parafusos = i*2,
                                             fs = FS,
                                             bolt_shear=F_vRd,
-                                            block = 0,
+                                            block = 0*unit['millimeter'],
                                             shear_plate = Vrd,
                                             plate_crush = F,
-                                            web_shear = 0,
+                                            web_shear = web_shear,
                                             uuid=uuid,
                                             solicitacao=solicitacao,)
                                 conexao.plotConnection()

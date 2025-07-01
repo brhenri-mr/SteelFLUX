@@ -83,7 +83,7 @@ for chapa_tipo in ['CH 1/4"','CH 3/16"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                               # Veificando o dimensionamento 
                               dimensionamento = conexao.analyze(solicitacao)
                               if dimensionamento:
-                                block, Vrd, F_vRd, F = dimensionamento['blockShear'], dimensionamento['platShear'], dimensionamento['blotShear'], dimensionamento['plateCrush'][0]
+                                block, Vrd, F_vRd, F, web_shear = dimensionamento['blockShear'], dimensionamento['platShear'], dimensionamento['blotShear'], dimensionamento['plateCrush'][0], dimensionamento['beamWebShear']
                                 FS = solicitacao/min(block, Vrd, F_vRd, F).magnitude
                                 
                                 ret = load_data(nome_perfil = 'W150x13',
@@ -98,7 +98,7 @@ for chapa_tipo in ['CH 1/4"','CH 3/16"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5
                                             block = block,
                                             shear_plate = Vrd,
                                             plate_crush = F,
-                                            web_shear = 0,
+                                            web_shear = web_shear,
                                             uuid=uuid,
                                             solicitacao=solicitacao,)
         
