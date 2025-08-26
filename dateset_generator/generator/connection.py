@@ -1173,6 +1173,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         assert self.lc.magnitude - self.Conectante.t_ch.magnitude> self.Conector.d_b.magnitude, 'Furo maior que comprimento da cantoneira'
         assert self.e.magnitude> self.Conector.d_b.magnitude/2, 'Distancia entre furo e centro menor que raio do Furo'
     
+    
     def plotLateral(self, show=False):
         '''
         Status: Validado
@@ -1227,14 +1228,14 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         #-------------------------------------Definição Cotas Horizontais----------------------------
         self.ax.annotate('', 
                     xy=(chapa_ponto_init[0] + self.lc.magnitude + 2, 
-                        chapa_ponto_init[1] + self.lc.magnitude + 10), 
+                        chapa_ponto_init[1] + self.lc.magnitude + 4), 
                     
                     xytext=(x_i ,
-                            chapa_ponto_init[1] + self.lc.magnitude + 10), 
+                            chapa_ponto_init[1] + self.lc.magnitude + 4), 
                     arrowprops={'arrowstyle': '<->'})
         
-        self.ax.text(chapa_ponto_init[0] + self.lc.magnitude + self.e.magnitude/2, 
-                        chapa_ponto_init[1] + self.lc.magnitude + 18, 
+        self.ax.text(chapa_ponto_init[0] + self.lc.magnitude - self.e.magnitude/2 - 4, 
+                        chapa_ponto_init[1] + self.lc.magnitude + 12, 
                                                 f'{round(self.e.magnitude,2)}', ha='left', va='center')  
         
                 
@@ -1445,7 +1446,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         
         self.ax.add_patch(background)
         
-        mask = patches.Rectangle((self.Coluna.h.magnitude + self.Coluna.tf.magnitude + 1, 
+        mask = patches.Rectangle((self.Coluna.h.magnitude, 
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2-self.Viga.tf.magnitude-10),
                                  self.Conectante.t_ch.magnitude + self.Conectante.lc.magnitude + 30, self.Viga.h.magnitude + 50, 
                                  edgecolor='white', facecolor='white', zorder=10)
@@ -1453,7 +1454,6 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
               
         # Salavando mascara
         self.fig.savefig(os.path.join(self.settings.DATASET_URL,'mask','lateral',f'{self.uuid}.png'), facecolor="black")
-        plt.close(self.fig)
         
         #-----------------mascara da imagem frontal----------------
         
@@ -1513,6 +1513,7 @@ class LCPP(BoltChecker, BeamChecker, BasicConnection):
         self.plotLateral()
         self.plotFrontal()
         self.plotTop(show=show)
+    
     
     def analyze(self, Fv):
         """

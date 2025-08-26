@@ -76,8 +76,14 @@ coluna = Column(
 
 parafuso = Conector(d_b=16,  f_ub=825)
 
+"""
+cantoneira = CornerFrame(t_ch=6.13,
+                                                        f_yc=345,
+                                                        f_uc=400,
+                                                        lc=120)
 
-"""lcpp = LCPP(
+
+lcpp = LCPP(
         Viga=viga,
         Coluna=coluna,
         Angle=cantoneira,
@@ -88,10 +94,10 @@ parafuso = Conector(d_b=16,  f_ub=825)
         dev_mode=True
     )
     
-lcpp.analyze(solicitacao)"""
-#lcpp.plotConnection(show=True)
-#lcpp.mask()
-
+lcpp.analyze(solicitacao)
+lcpp.plotConnection(show=True)
+lcpp.mask()
+"""
 
 for el in cantoneira_dados.keys():
     for el_coner in cantoneira_dados[el]:
@@ -107,7 +113,7 @@ for el in cantoneira_dados.keys():
                                                         f_uc=400,
                                                         lc=el_coner['b_mm'])
 
-                              print(f'Teste com {element} para {i*2} parafusos com cantoneira 2xL{el}x{el_coner['t_mm']} {nome}')
+                              print(f'Teste com ø={element}mm para {i} parafusos com cantoneira 2xL{el}x{el_coner['t_mm']} {nome}')
                               parafuso = Conector(d_b=element,
                                                 f_ub=825)
                               
@@ -115,7 +121,7 @@ for el in cantoneira_dados.keys():
                                                     Viga=viga,
                                                     Coluna=coluna,
                                                     Angle=cantoneira,
-                                                    n_ps=2*i,
+                                                    n_ps=2*i, # O valor 2 multiplicado é uma correção, o código foi feito para a chapa de fundo que é simétrica. Então quando eu coloc n_ps*2 o código divide por 2. Então fica um
                                                     uuid=uuid,
                                                     s=element*3.01,
                                                     dev_mode=False,
@@ -133,7 +139,7 @@ for el in cantoneira_dados.keys():
                                             bitola_parafuso = element,
                                             material_chapa = nome,
                                             distancia_s = 3.01*element,
-                                            qntd_parafusos = i*2,
+                                            qntd_parafusos = i,
                                             fs = FS,
                                             bolt_shear=F_vRd,
                                             block = 0*unit['millimeter'],
@@ -146,6 +152,7 @@ for el in cantoneira_dados.keys():
                                 conexao.mask()
                               
                         except AssertionError as e:
-                              print(f'Falha em {element} para o conjunto com {i*2} parafusos')
-                              print(f'{e}')
-                              break
+                            print('*'*20)
+                            #print(f'Falha em {element} para o conjunto com {i*2} parafusos')
+                            #print(f'{e}')
+                            break
