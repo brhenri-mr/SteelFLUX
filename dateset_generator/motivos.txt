@@ -1,0 +1,3 @@
+Foi escolhido o perfil W 250 x 44,8  por ficar em um valor intermediário entre as outras resistência 
+permitindo que elas, as outras resistências, fossem limitentes em mais situações. Perfil abaixo deste
+provocam o Cisalhamento na alma como limitando, reduzindo a informação das chapas

@@ -74,6 +74,7 @@ class BasicConnection:
                  Result_unit='kilonewton',
                  dev_mode=True,
                  coef=1.35,
+                 size=(10.24, 10.24)
                  ):
        
        
@@ -102,9 +103,9 @@ class BasicConnection:
         self.Result_unit = Result_unit
         self.coef = coef
         self.Conectante = Conectante
-        self.fig, self.ax = plt.subplots(figsize=(8, 6))
-        self.fig_frontal, self.ax_frontal = plt.subplots(figsize=(8, 6))
-        self.fig_top, self.ax_top = plt.subplots(figsize=(8, 6))
+        self.fig, self.ax = plt.subplots(figsize=size)
+        self.fig_frontal, self.ax_frontal = plt.subplots(figsize=size)
+        self.fig_top, self.ax_top = plt.subplots(figsize=size)
         self.TAMANHO = Settings().TAMANHO_IMG
         self.checked = False
         

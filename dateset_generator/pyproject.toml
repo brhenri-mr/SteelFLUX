@@ -1,9 +1,11 @@
 [tool.poetry]
-name = "gerdau"
+name = "dateset_generator"
 version = "0.1.0"
 description = ""
 authors = ["brhenri-mr <superbr55@gmail.com>"]
 readme = "README.md"
+package-mode = false  # ← Adicione esta linha
+
 
 [tool.poetry.dependencies]
 python = "^3.11"

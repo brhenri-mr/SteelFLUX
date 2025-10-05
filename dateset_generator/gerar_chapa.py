@@ -4,7 +4,7 @@ import pandas as pd
 from generator.db import load_data
 from uuid import uuid4
 
-solicitacao = 50 # KN
+solicitacao = 120 # KN
 
 
 saida = pd.DataFrame(columns=['Perfil', 'Chapa', 'Bitola','Material', 's', 'Parafuso', 'Block', 
@@ -17,20 +17,20 @@ material = {'A36': {'fy':250, 'fu':400},
             'A527_GR50':{'fy':345, 'fu':450},
             'A527_GR55':{'fy':380, 'fu':485}}
 
-viga = Beam(name='W150x13',
-            tw=4.3,
-            tf=4.3,
-            h=138,
-            bf=80,
+viga = Beam(name='W 250 x 44,8' ,
+            tw=7.6,
+            tf=13,
+            h=240,
+            bf=148,
             fy=345,
             fu=400)
 
 coluna = Column(
-      name='w',
-      h=80,
-      tf=4.3,
-      tw=4.3,
-      bf=250,
+      name='HP 310 x 79,0 (H)',
+      h=277,
+      tf=11,
+      tw=11,
+      bf=306,
 )
 
 #parafuso = Conector(d_b=16,  f_ub=825)
@@ -48,13 +48,7 @@ i= 0
 
 for chapa_tipo in ['CH 1/4"','CH 3/16"', 'CH 5/16"', 'CH 3/8"', 'CH 1/2"', 'CH 5/8"', 'CH 3/4"', 'CH 7/8"' ]:
       for nome, materia_chapa in material.items():
-            if i == 5:
-                break
-            
             for element in bitolas:
-                  if i == 5:
-                    break
-                
                   i = 0
                   while True:
                         i += 1
