@@ -19,7 +19,7 @@ material = {'A36': {'fy':250, 'fu':400},
 
 viga = Beam(name='W 250 x 44,8' ,
             tw=7.6,
-            tf=13,
+            tf=13*0.8, # So visual, com o 13 dica mto desproporcional
             h=240,
             bf=148,
             fy=345,
@@ -27,7 +27,7 @@ viga = Beam(name='W 250 x 44,8' ,
 
 coluna = Column(
       name='HP 310 x 79,0 (H)',
-      h=277,
+      h=140,
       tf=11,
       tw=11,
       bf=306,

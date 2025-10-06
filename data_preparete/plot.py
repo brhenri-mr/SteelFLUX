@@ -62,7 +62,7 @@ def plot(dados, materiais):
 	ax.add_artist(legend1)
 
 	# Anotação sobre opacidade
-	ax.text(0.02, 0.98, 'Opacidade: quanto mais opaco, maior a espessura da chapa', 
+	ax.text(0.02, 0.98, 'Opacidade: quanto mais opaco, menor a espessura da chapa', 
 			transform=ax.transAxes, fontsize=10, 
 			verticalalignment='top', style='italic',
 			bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))

@@ -134,7 +134,7 @@ class BasicConnection:
                     os.makedirs(os.path.join(self.settings.DATASET_URL, pasta, subpasta), exist_ok=True)
             
     
-    def plotBasic(self, SHOW=False):
+    def plotBasic(self, SHOW=False, descolamento=200):
         '''
         Plot da vista básica lateral da conexão
         '''
@@ -163,17 +163,17 @@ class BasicConnection:
         # ---------------------------------VIGA-----------------------------------------------------
         mesa1 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
                                   self.TAMANHO/2 + self.Viga.h.magnitude/2 ), 
-                                 100+self.lc.magnitude, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
+                                 descolamento+self.lc.magnitude, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
         self.ax.add_patch(mesa1)
         
         mesa2 = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude*1.6 ), 
-                                 100+self.lc.magnitude, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
+                                 descolamento+self.lc.magnitude, self.Viga.tf.magnitude*1.6, edgecolor='black', facecolor='gray')
         self.ax.add_patch(mesa2)
         
         alma = patches.Rectangle((self.Coluna.h.magnitude + 2*self.Coluna.tf.magnitude + 1 + self.Conectante.t_ch.magnitude, 
                                   self.TAMANHO/2 - self.Viga.h.magnitude/2), 
-                                 100+self.lc.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='gray')
+                                 descolamento+self.lc.magnitude, self.Viga.h.magnitude, edgecolor='black', facecolor='gray')
         self.ax.add_patch(alma)
         self.ax.axis('off')
 
