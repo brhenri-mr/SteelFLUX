@@ -910,15 +910,19 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  self.Conectante.t_ch.magnitude*1.5 + 45, self.Viga.h.magnitude+50, 
                                  edgecolor='white', facecolor='white', zorder=10)
         self.ax.add_patch(mask)
+
               
         # Salavando mascara
         self.fig.savefig(os.path.join(self.settings.DATASET_URL,'mask','lateral',f'{self.uuid}.png'), facecolor="black")
         plt.close(self.fig)
         
         #-----------------mascara da imagem frontal----------------
+        centro_x = (self.Conectante.c.magnitude*0.1 + self.Conectante.c.magnitude)/2
+        centro_y = (self.Viga.h.magnitude*0.1 + self.Viga.h.magnitude)/2
+        off_set = self.Conectante.c.magnitude*0.05 # preciso desse valor para que as coisas se encaixem
         
-        
-        
+        off_set_y = self.Viga.h.magnitude*0.05
+
         background = patches.Rectangle(((self.Conectante.c.magnitude*0.1 + self.Chapa.c.magnitude)/2 + self.Conectante.c.magnitude*0.05 - self.Coluna.bf.magnitude/2 ,
                                         -self.TAMANHO/2),
                                        self.Coluna.bf.magnitude , self.TAMANHO*2,
@@ -933,8 +937,27 @@ class EndPLate(BoltChecker, BasicConnection, BeamChecker):
                                  edgecolor='white', 
                                  facecolor='white',
                                  zorder=10)
-        self.ax_frontal.add_patch(mask)
         
+        self.ax_frontal.add_patch(mask)
+        points = [
+                (centro_x - self.Viga.bf.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude + off_set_y),
+                (centro_x - self.Viga.bf.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x - self.Viga.tw.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x - self.Viga.tw.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x - self.Viga.bf.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x - self.Viga.bf.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + self.Viga.tf.magnitude + off_set_y),
+                (centro_x + self.Viga.bf.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + self.Viga.tf.magnitude + off_set_y),
+                (centro_x + self.Viga.bf.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x + self.Viga.tw.magnitude/2 + off_set, centro_y + self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x + self.Viga.tw.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x + self.Viga.bf.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 + off_set_y),
+                (centro_x + self.Viga.bf.magnitude/2 + off_set, centro_y - self.Viga.h.magnitude/2 - self.Viga.tf.magnitude + off_set_y),
+        ]
+        
+        # Adicionado A viga
+        perfil = patches.Polygon(points ,closed=True, fill=True, edgecolor='black', facecolor='black',linewidth=2, zorder=10)
+        self.ax_frontal.add_patch(perfil)
+
         self.fig_frontal.savefig(os.path.join(self.settings.DATASET_URL,'mask','frontal',f'{self.uuid}.png'), facecolor="black")
         plt.close(self.fig_frontal)
          
