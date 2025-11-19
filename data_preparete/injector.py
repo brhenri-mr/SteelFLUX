@@ -37,8 +37,7 @@ class CustomeDataSet():
 
             # Escrevendo o propmt da imagem
             
-            caption = f'Complete the masked region on the left with the cross-sectional view, and the masked region on the right with the plan detail of a steel structural connection between an I-beam and an I-column, designed for a vertical load of {self.carregamento[index]} kN.Use the following information: seção viga: {self.viga[index]}, Bitola do parafuso: {self.bitola[index]}, quantidade de parafusos: {self.qntd_parafusos[index]}, FS: {self.fs[index]}. Use technical representation according to structural drawing standards, including visible profiles, bolts, and connection plates.'
-
+            caption= f'''Steel connection detail drawing, {"W 250 x 44,8'"} beam to {"HP 310 x 79,0 (H)"} column with a {round(self.fs[index], 4)} safety factor, {"ASTM A36"} steel material, CONNECTION DETAIL WITH DIMENSIONS, dimension lines showing bolt spacing and plate dimensions, measurements on connection plates only, clean undimensioned beam and column sections, annotated joint area, dimension callouts concentrated at connection interface, technical detail with local dimensioning'''
 
             return caption, img_uuid
         else:
