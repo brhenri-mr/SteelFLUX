@@ -1,34 +1,45 @@
-# Introduction
+# SteelFLUX — Generative AI for Structural Steel Connections
 
-This repository is dedicate my research about automatic design, focus on generate structure steel connections.
+> Master's research project. Fine-tuning of ACE++ (FluxFill inpainting model) 
+> to automatically generate structural steel connections conditioned on 
+> engineering design parameters.
 
-> **Objective:** Explore inpainting techniques to generate structural steel connections using the Flux model for infill design.
+## Overview
 
-# Models
+Steel connection design is a repetitive, high-expertise task with no 
+automated solution in current practice. This research explores whether 
+generative inpainting models can produce structurally plausible connection 
+images conditioned on design data (loads, profiles, bolt patterns).
+
+## Architecture
+
+The pipeline has two decoupled components:
+
+**1. Dataset Generator**
+- Generates triplets: `(image, mask, base)` for inpainting training
+- Stores design metadata in a SQLite database linked to each image
+- Covers lateral, frontal, and superior views of connections
+
+**2. Fine-tuning (ACE++ / FluxFill)**
+- LoRA fine-tuning on the generated dataset
+- Experiments tracked with varying rank, alpha, learning rate, and resolution
+
+## Training History
+
+| Experiment | LoRA Rank | Alpha | LR | Resolution | Best Score |
+|------------|-----------|-------|----|------------|------------|
+| 20251007 | 8 | 8 | 1e-4 | 720x720 | 6 |
+| 20251012 | 32 | 32 | 1e-4 | 720x720 | 7 |
+| 20251020 | 128 | 128 | 1e-4 | 1024x1024 | 4 |
+| **20251027** | **32** | **32** | **1e-4** | **1024x1024** | **10** |
+| 20251031 | 64 | 64 | 1e-4 | 1024x1024 | 8 |
+
+> Best result: LoRA rank 32, alpha 32, LR 1e-4, 1024×1024
 
 
-# Training History
-| Experimento | Lora | Alpha LoRA | LR | Batch Size | Qualidade | Lateral | Frontal | Superior | Resultado |
-|-------------|------|------------|---------|------------|-----------|---------|---------|----------|-----------|
-| | | | | | Continuidade | Qualidade do Texto | Detalhes | Qualidade | Continuidade | Furos | Detalhes | Continuidade | Qualidade |
-| 20251007133647 | 8 | 8 | 1,00E-04 | 1 | 720x720 | 4 | 4 | 8 | 6 | 6 | 10 | 8 | 10 | 9 | 7,222222222 |
-| 20251012150858 | 32 | 32 | 1,00E-04 | 1 | 720x720 | 10 | 10 | 10 | 7 | 6 | 8 | 8 | 10 | 9 | 8,666666667 |
-| 20251020135238 | 128 | 128 | 1,00E-04 | 1 | 1024x1024 | 8 | 10 | 9 | 4 | 0 | 0 | 6 | 10 | 10 | 6,333333333 |
-| 20251027130156 | 32 | 32 | 1,00E-04 | 1 | 1024x1024 | 8 | 10 | 10 | 10 | 10 | 4 | 8 | 8 | 6 | 8,222222222 |
-| 20251031000108 | 64 | 64 | 1,00E-04 | 1 | 1024x1024 | 4 | 4 | 8 | 8 | 0 | 0 | 0 | 0 | 5 | 6 | 3,444444444 |
-| 20251103111510 | 16 | 16 | 1,00E-04 | 1 | 1020x1024 | 5 | 8 | 10 | 0 | 0 | 0 | 0 | 8 | 10 | 4,555555556 |
-| 20251105001235 | 32 | 64 | 5,00E-05 | 2 | 1024x1024 | 12 | 12 | 12 | 0 | 0 | 4 | 5 | 6 | 8 | 6,555555556 |
-| -3264 | | 2 | 2,00E-05 | 2 | 1024x1024 | 5 | 5 | 5 | 0 | 0 | 0 | 0 | 2 | 2 | 2,111111111 |
-| 20251109053855 | 32 | 96 | 5,00E-05 | 2 | 1024x1024 | 12 | 12 | 12 | 0 | 1 | 6 | 5 | 10 | 10 | 7,555555556 |
-| -64192 | | 2 | 2,00E-05 | 2 | 1024x1024 | 12 | 12 | 12 | 2 | 1 | 4 | 5 | 10 | 10 | 7,555555556 |
-| -64192 | | 5 | 2,00E-05 | 2 | 1024x1024 | 12 | 12 | 12 | 3 | 1 | 4 | 5 | 10 | 10 | 7,666666667 |
-| -64192 | | 7 | 2,00E-05 | 2 | 1024x1024 | 12 | 12 | 12 | 3 | 1 | 6 | 5 | 10 | 10 | 7,888888889 |
-| -64192 | | 1 | 1,00E-04 | 2 | 1024x1024 | 12 | 12 | 12 | 4 | 1 | 8 | 5 | 10 | 10 | 8,222222222 |
 
+## Dataset Examples
 
-# Results
+*Samples from the automatically generated training dataset:*
 
-
-
-
-# Update History
+![Example](data_preparete/data_train/14332205-f354-4c40-856c-0a3683a82a1b.png)
