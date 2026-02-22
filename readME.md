@@ -41,5 +41,16 @@ The pipeline has two decoupled components:
 ## Dataset Examples
 
 *Samples from the automatically generated training dataset:*
+![Example](ImagensBase.png)
 
-![Example](data_preparete/data_train/14332205-f354-4c40-856c-0a3683a82a1b.png)
+
+## Results
+
+### Lateral
+![Example](Lateral-All(1).png)
+
+### Frontal 
+![Example](Frontal-All(1).png)
+
+### Superior
+![Example](Superior-All(1).png)
