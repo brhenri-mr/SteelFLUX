@@ -11,6 +11,24 @@ automated solution in current practice. This research explores whether
 generative inpainting models can produce structurally plausible connection 
 images conditioned on design data (loads, profiles, bolt patterns).
 
+## Install
+
+```bash
+# Clone repository
+git clone https://github.com/brhenri-mr/SteelFLUX.git
+cd SteelFlux
+
+# Install dependencies
+poetry install
+```
+
+## Generate database
+| Connection | Command | 
+|------------|-----------|
+| Endplate |  ```poetry run python gerar_chapa.py```| 
+| Double Conner | ```poetry run python gerar_canto.py``` |
+
+
 ## Architecture
 
 The pipeline has two decoupled components:
