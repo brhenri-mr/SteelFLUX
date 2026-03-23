@@ -20,7 +20,18 @@ cd SteelFlux
 
 # Install dependencies
 poetry install
+
+# .env configurations
+touch .env
 ```
+## Configuration .env
+
+| Parameter | Default Value | Description |
+|-----------|--------------|-------------|
+| `DATABASE_URL` | `sqlite:///database.db` | Database connection URL |
+| `DATASET_URL` | `./data` | Path to the dataset directory |
+| `TAMANHO_IMG` | `300` | Image size (in pixels) |
+| `EXT` | `png` | Image file extension |
 
 ## Generate database
 | Connection | Command | 
