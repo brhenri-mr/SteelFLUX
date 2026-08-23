@@ -1,8 +1,4 @@
-# SteelFLUX — Generative AI for Structural Steel Connections
-
-> Master's research project. Fine-tuning of ACE++ (FluxFill inpainting model) 
-> to automatically generate structural steel connections conditioned on 
-> engineering design parameters.
+# SteelFLUX
 
 ## Overview
 
@@ -15,7 +11,7 @@ images conditioned on design data (loads, profiles, bolt patterns).
 
 ```bash
 # Clone repository
-git clone https://github.com/brhenri-mr/SteelFLUX.git
+git clone 
 cd SteelFlux
 
 # Install dependencies
@@ -73,13 +69,3 @@ The pipeline has two decoupled components:
 ![Example](ImagensBase.png)
 
 
-## Results
-
-### Lateral
-![Example](Lateral-All(1).png)
-
-### Frontal 
-![Example](Frontal-All(1).png)
-
-### Superior
-![Example](Superior-All(1).png)
